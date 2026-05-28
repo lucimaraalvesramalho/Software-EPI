@@ -21,7 +21,8 @@ class epi:
         self.validade_certificado_epi = validade_certificado_epi
 
 class funcionario:
-    def __init__(self, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario):
+    def __init__(self, matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario):
+        self.matricula_funcionario = matricula_funcionario
         self.nome_funcionario = nome_funcionario
         self.cpf_funcionario = cpf_funcionario
         self.setor_funcionario = setor_funcionario
@@ -37,11 +38,21 @@ class registros:
         self.data_troca = data_troca
         self.motivo_devolucao = motivo_devolucao
 
-@app.route('/epi', methods=['POST'])
-
-def registrar_epi():
+@app.route('/api/funcionario', methods=['POST'])
+def cadastrar_funcionario():
     dados = request.get_json()
-    func = epi(dados['nome_epi'], dados['tipo_epi'], dados['CA_epi'], dados['validade_certificado_epi'])
+    func = funcionario(dados['nome_funcionario'], dados['cpf_funcionario'], dados['setor_funcionario'], dados['funcao_funcionario'], dados['data_admissao_funcionario'])
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    sql = "INSERT INTO funcionarios (matricula_funcionario ,nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario) VALUES (%s, %s, %s, %s, %s)"
+
+    cursor.execute(sql, (func.matricula_funcionario, func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario))
+
+    conn.commit()
+    cursor.close()
+
+    conn.close()
+
+    return jsonify({'message': 'Funcionário cadastrado com sucesso'}), 201
