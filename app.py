@@ -13,7 +13,7 @@ db_config = {
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
-class epi:
+class epis:
     def __init__(self, nome_epi, tipo_epi, CA_epi, validade_certificado_epi):
         self.nome_epi = nome_epi
         self.tipo_epi = tipo_epi
@@ -56,3 +56,41 @@ def cadastrar_funcionario():
     conn.close()
 
     return jsonify({'message': 'Funcionário cadastrado com sucesso'}), 201
+
+app.route('/api/epi', methods=['POST'])
+def cadastrar_epi():
+    dados = request.get_json()
+    epi = epis(dados['nome_epi'], dados['tipo_epi'], dados['CA_epi'], dados['validade_certificado_epi'])
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = "INSERT INTO epis (nome_epi, tipo_epi, CA_epi, validade_certificado_epi) VALUES (%s, %s, %s, %s)"
+
+    cursor.execute(sql, (epi.nome_epi, epi.tipo_epi, epi.CA_epi, epi.validade_certificado_epi))
+
+    conn.commit()
+    cursor.close()
+
+    conn.close()
+
+    return jsonify({'message': 'EPI cadastrado com sucesso'}), 201
+
+app.route('/api/registro', methods=['POST'])
+def cadastrar_registro():
+    dados = request.get_json()
+    registro = registros(dados['matricula_funcionario'], dados['ca_epi'], dados['data_entrega'], dados['data_devolucao'], dados['data_troca'], dados['motivo_devolucao'])
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = "INSERT INTO registros (matricula_funcionario, ca_epi, data_entrega, data_devolucao, data_troca, motivo_devolucao) VALUES (%s, %s, %s, %s, %s, %s)"
+
+    cursor.execute(sql, (registro.matricula_funcionario, registro.ca_epi, registro.data_entrega, registro.data_devolucao, registro.data_troca, registro.motivo_devolucao))
+
+    conn.commit()
+    cursor.close()
+
+    conn.close()
+
+    return jsonify({'message': 'Registro cadastrado com sucesso'}), 201
