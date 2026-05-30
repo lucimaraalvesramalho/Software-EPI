@@ -3,16 +3,18 @@ import mysql.connector
 
 app = Flask(__name__)
 
+# Criação da conexão com o banco de dados MySQL
 db_config = {
     'host': 'localhost',
     'database': 'controle_epi',
     'user': 'root',
     'password': '1513'
 }
-
+# Configurações do banco de dados MySQL
 def get_db_connection():
     return mysql.connector.connect(**db_config)
 
+# Definição das classes para representar os dados
 class epis:
     def __init__(self, nome_epi, tipo_epi, CA_epi, validade_certificado_epi):
         self.nome_epi = nome_epi
@@ -38,6 +40,7 @@ class registros:
         self.data_troca = data_troca
         self.motivo_devolucao = motivo_devolucao
 
+# Definição das rotas para cadastro de funcionários, EPIs e registros
 @app.route('/api/funcionario', methods=['POST'])
 def cadastrar_funcionario():
     dados = request.get_json()
