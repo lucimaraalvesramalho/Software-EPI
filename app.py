@@ -44,6 +44,7 @@ class registros:
         self.data_troca = data_troca
         self.motivo_devolucao = motivo_devolucao
 
+#============ CREATE ============
 # Definição das rotas para cadastro de funcionários, EPIs e registros
 
 @app.route('/api/funcionario', methods=['POST'])
@@ -113,7 +114,8 @@ def cadastrar_registro():
 
     return jsonify({'message': 'Registro cadastrado com sucesso'}), 201
 
-# Rotas para atualização e deleção de funcionários
+#============ UPDATE ============
+# Rotas para atualização de funcionários, EPIs e registros
 @app.route('/api/funcionario/<matricula>', methods=['PUT'])
 def atualizar_funcionario(matricula):
     dados = request.get_json()
@@ -135,22 +137,7 @@ def atualizar_funcionario(matricula):
 
     return jsonify({'message': 'Funcionário atualizado com sucesso'}), 200
 
-@app.route('/api/funcionario/<matricula>', methods=['DELETE'])
-def deletar_funcionario(matricula):
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    sql = "DELETE FROM funcionarios WHERE matricula_funcionario = %s"
-    cursor.execute(sql, (matricula,))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({'message': 'Funcionário deletado com sucesso'}), 200
-
-
-# Rotas para atualização e deleção de EPIs
 @app.route('/api/epi/<ca_epi>', methods=['PUT'])
 def atualizar_epi(ca_epi):
     dados = request.get_json()
@@ -170,21 +157,6 @@ def atualizar_epi(ca_epi):
 
     return jsonify({'message': 'EPI atualizado com sucesso'}), 200
 
-@app.route('/api/epi/<ca_epi>', methods=['DELETE'])
-def deletar_epi(ca_epi):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    sql = "DELETE FROM epis WHERE CA_epi = %s"
-    cursor.execute(sql, (ca_epi,))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({'message': 'EPI deletado com sucesso'}), 200
-
-# Rotas para atualização e deleção de registros
 @app.route('/api/registro/<matricula>/<ca_epi>', methods=['PUT'])
 def atualizar_registro(matricula, ca_epi):
     dados = request.get_json()
@@ -204,6 +176,39 @@ def atualizar_registro(matricula, ca_epi):
     conn.close()
 
     return jsonify({'message': 'Registro atualizado com sucesso'}), 200
+
+#============ DELETE ============
+# Rotas para deletar funcionários, epi's e registros
+
+@app.route('/api/funcionario/<matricula>', methods=['DELETE'])
+def deletar_funcionario(matricula):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = "DELETE FROM funcionarios WHERE matricula_funcionario = %s"
+    cursor.execute(sql, (matricula,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'Funcionário deletado com sucesso'}), 200
+
+
+@app.route('/api/epi/<ca_epi>', methods=['DELETE'])
+def deletar_epi(ca_epi):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = "DELETE FROM epis WHERE CA_epi = %s"
+    cursor.execute(sql, (ca_epi,))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'EPI deletado com sucesso'}), 200
+
 
 @app.route('/api/registro/<matricula>/<ca_epi>', methods=['DELETE'])
 def deletar_registro(matricula, ca_epi):
