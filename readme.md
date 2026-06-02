@@ -4,7 +4,6 @@
 controller/        # contém rotas e funções do SQL
 ├── routes.py
 
-<<<<<<< HEAD
 modelsy/           # contém classes que representam tabelas
 ├── tables.py
 
@@ -18,4 +17,4 @@ templates/         # HTML principal
 app.py             # script principal
 database.py        # configuração da conexão SQL
 ```
-=======
+
