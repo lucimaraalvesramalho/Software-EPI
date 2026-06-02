@@ -8,6 +8,5 @@ db_config = {
     'password': '1513'
 }
 
-
 def get_db_connection():
     return mysql.connector.connect(**db_config)
