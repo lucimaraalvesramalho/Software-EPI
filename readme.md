@@ -4,7 +4,7 @@
 controller/        # contém rotas e funções do SQL
 ├── routes.py
 
-modelsy/           # contém classes que representam tabelas
+models/            # contém classes que representam tabelas
 ├── tables.py
 
 static/            # JS e CSS da página
