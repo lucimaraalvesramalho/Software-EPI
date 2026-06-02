@@ -1,7 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import mysql.connector
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='view', static_folder='view')
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 # Criação da conexão com o banco de dados MySQL
 db_config = {
@@ -23,7 +27,8 @@ class epis:
         self.validade_certificado_epi = validade_certificado_epi
 
 class funcionario:
-    def __init__(self, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario):
+    def __init__(self,matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario):
+        self.matricula_funcionario = matricula_funcionario
         self.nome_funcionario = nome_funcionario
         self.cpf_funcionario = cpf_funcionario
         self.setor_funcionario = setor_funcionario
@@ -40,17 +45,28 @@ class registros:
         self.motivo_devolucao = motivo_devolucao
 
 # Definição das rotas para cadastro de funcionários, EPIs e registros
+
 @app.route('/api/funcionario', methods=['POST'])
 def cadastrar_funcionario():
-    dados = request.get_json()
-    func = funcionario(dados['nome_funcionario'], dados['cpf_funcionario'], dados['setor_funcionario'], dados['funcao_funcionario'], dados['data_admissao_funcionario'])
+    dados = request.get_json(silent=True)
+    if not dados:
+        dados = request.form.to_dict()
+
+    func = funcionario(
+        dados['matricula_funcionario'],
+        dados['nome_funcionario'],
+        dados['cpf_funcionario'],
+        dados['setor_funcionario'],
+        dados['funcao_funcionario'],
+        dados['data_admissao_funcionario']
+    )
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    sql = "INSERT INTO funcionarios (nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario) VALUES (%s, %s, %s, %s, %s)"
+    sql = "INSERT INTO funcionarios (matricula_funcionario ,nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario) VALUES (%s, %s, %s, %s, %s, %s)"
 
-    cursor.execute(sql, (func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario))
+    cursor.execute(sql, (func.matricula_funcionario, func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario))
 
     conn.commit()
     cursor.close()
@@ -96,6 +112,7 @@ def cadastrar_registro():
     conn.close()
 
     return jsonify({'message': 'Registro cadastrado com sucesso'}), 201
+
 # Rotas para atualização e deleção de funcionários
 @app.route('/api/funcionario/<matricula>', methods=['PUT'])
 def atualizar_funcionario(matricula):
@@ -167,7 +184,6 @@ def deletar_epi(ca_epi):
 
     return jsonify({'message': 'EPI deletado com sucesso'}), 200
 
-
 # Rotas para atualização e deleção de registros
 @app.route('/api/registro/<matricula>/<ca_epi>', methods=['PUT'])
 def atualizar_registro(matricula, ca_epi):
@@ -202,3 +218,6 @@ def deletar_registro(matricula, ca_epi):
     conn.close()
 
     return jsonify({'message': 'Registro deletado com sucesso'}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
