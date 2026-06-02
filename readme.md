@@ -1,19 +1,19 @@
-O código está separado em pastas e em partes que executam uma unica função.
+## Estrutura do projeto
 
-esquema de separação:
+```
+controller/        # contém rotas e funções do SQL
+├── routes.py
 
-controller ⇒ (contém rotas e funções do sql)
-    ↳ routes.py
+modelsy/           # contém classes que representam tabelas
+├── tables.py
 
-modelsy ⇒ (contém as classes que referenciam as tabelas)
-    ↳ tables.py
+static/            # JS e CSS da página
+├── script.js
+├── style.css
 
-static ⇒ (codigo de javascript e css para a pagina web)
-    ↳ script.js
-      style.css
+templates/         # HTML principal
+├── index.html
 
-templates ⇒ ( contém o index da página)
-    ↳ index.html
-
-app.py ⇒(script principal que executa tudo)
-database.py ⇒ (possui as configurações de conexão com o sql)
+app.py             # script principal
+database.py        # configuração da conexão SQL
+```
