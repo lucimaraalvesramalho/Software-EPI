@@ -14,29 +14,27 @@ Aplicativo web simples para cadastro de funcionários e gerenciamento de EPIs.
 ## Estrutura do projeto
 
 ```
-controller/        # rotas e funções do SQL
+app.py
+controller/
 ├── routes.py
-
-models/            # classes que representam tabelas
+models/
 ├── tables.py
-
-static/            # JS e CSS da página
+static/
+├── css/
+│   ├── cadastro-funcionario.css
+│   └── global.css
 ├── script.js
-├── style.css
-
-templates/         # HTML principal e layouts
-├── base.html
-├── index.html
-├── cadastrar-funcionario.html
-├── cadastrar-epi.html
-├── criar-registro.html
+templates/
 ├── atualizar-cadastros.html
 ├── atualizar-registros.html
-├── components/
-│   └── header.html
-
-app.py             # script principal
-database.py        # configuração da conexão SQL
+├── base.html
+├── cadastrar-epi.html
+├── cadastrar-funcionario.html
+├── criar-registro.html
+├── index.html
+└── components/
+    └── header.html
+database.py
 ```
 
 ## Requisitos
@@ -79,3 +77,9 @@ Então acesse `http://127.0.0.1:5000` no navegador.
 - Se o JS não carregar, confirme se o caminho do script em `templates/base.html` está correto.
 - Ajuste as rotas e a configuração do banco conforme necessário.
 
+## Extensões recomendadas para VS Code
+
+- Thunder Client
+- Database Client JDBC
+- MySQL
+- python (Pylance, Python, Python Debugger e Python Enviroments)
