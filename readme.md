@@ -41,7 +41,7 @@ database.py
 
 - Python 3.10+ (ou compatível)
 - Flask
-- SQLAlchemy ou outra biblioteca usada no `database.py`
+- MySQL Connector/Python
 
 ## Instalação
 
@@ -58,10 +58,10 @@ venv\Scripts\activate
 pip install flask
 ```
 
-> Se o projeto usar SQLAlchemy, instale também:
-> ```bash
-> pip install sqlalchemy
-> ```
+instale também:
+```bash
+pip install mysql-connector-python
+```
 
 ## Execução
 
