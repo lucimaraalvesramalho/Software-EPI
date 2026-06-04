@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, request, jsonify
+﻿from flask import Blueprint, render_template, request, jsonify
 from models.tables import funcionario, epis, registros
 from database import get_db_connection
 
@@ -183,3 +183,29 @@ def deletar_registro(matricula, ca_epi):
     conn.close()
 
     return jsonify({'message': 'Registro deletado com sucesso'}), 200
+
+
+# HTML ROUTES - Rotas para renderizar as páginas HTML
+@api_routes.route('/index')
+def index():
+    return render_template('index.html')
+
+@api_routes.route('/cadastro-funcionario')
+def cadastro_funcionario():
+    return render_template('cadastrar-funcionario.html')
+
+@api_routes.route('/cadastro-epi')
+def cadastro_epi():
+    return render_template('cadastrar-epi.html')
+
+@api_routes.route('/criar-registro')
+def criar_registro():
+    return render_template('criar-registro.html')   
+
+@api_routes.route('/atualizar-registro')
+def atualizar_registros():
+    return render_template('atualizar-registros.html')
+
+@api_routes.route('/atualizar-cadastros')
+def atualizar_cadastros():
+    return render_template('atualizar-cadastros.html')

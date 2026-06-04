@@ -25,3 +25,5 @@ const form = document.getElementById('funcionarioForm');
                 form.reset();
             }
         });
+
+        

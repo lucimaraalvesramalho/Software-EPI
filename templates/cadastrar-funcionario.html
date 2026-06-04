@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro-funcionario.css') }}">
+{% endblock %}
+
+{% block content %}
+    <main>
+        <h1>Cadastro de Funcionário</h1>
+        <div class="cadastro">
+            <p>Preencha o formulário abaixo para cadastrar um novo funcionário:</p>
+            <form id="funcionarioForm">
+                <input id="matricula" name="matricula_funcionario" type="text" placeholder="Matrícula do funcionário" required>
+                <input id="nome" name="nome_funcionario" type="text" placeholder="Nome do funcionário" required>
+                <input id="cpf" name="cpf_funcionario" type="text" placeholder="CPF do funcionário" required>
+                <input id="setor" name="setor_funcionario" type="text" placeholder="Setor do funcionário" required>
+                <input id="funcao" name="funcao_funcionario" type="text" placeholder="Função do funcionário" required>
+                <input id="data_admissao" name="data_admissao_funcionario" type="date" required>
+                <div id="buttons">
+                    <button type="submit" id="submit-btn">Cadastrar</button>
+                    <button id="theme-btn" type="button"><i id="theme-icon" class="fas fa-moon"></i></button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        const button = document.getElementById("theme-btn");
+        const icon = document.getElementById("theme-icon");
+
+        const setTheme = (dark) => {
+            document.body.classList.toggle("dark-theme", dark);
+            icon.classList.toggle("fa-sun", dark);
+            icon.classList.toggle("fa-moon", !dark);
+            localStorage.setItem("theme", dark ? "dark" : "light");
+        };
+
+        setTheme(localStorage.getItem("theme") === "dark");
+
+        button.addEventListener("click", () => {
+            setTheme(!document.body.classList.contains("dark-theme"));
+        });
+    </script>  
+{% endblock %}

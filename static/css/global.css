@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+*{
+    box-sizing: border-box;
+    color: var(--text-color);
+}
+
+:root{
+    --bg-color: #ecfef8;
+    --primary: #34e5aa;
+    --secondary: #8187ee;
+    --accent: #824fe8;
+    --text-color: #042016;
+    --tertiary: #c9f1e7;
+}
+
+.dark-theme{
+    --bg-color: #0f1412;
+    --primary: #1fd39a;
+    --secondary: #5c63d6;
+    --accent: #7a4ae0;
+    --text-color: #e9fff7;
+    --tertiary: #1b2a25;
+}
+
+body{
+    font-family: "Inter", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: var(--bg-color);
+}
+
+header{
+    position: fixed;
+    bottom: 20px;
+    display: flex;
+    margin-top: 1%;
+    width: fit-content;
+    height: 8vh;
+    align-items: center;
+    justify-content: center;
+    padding: 2%;
+    border: var(--secondary) 1px solid;
+    border-radius: 30px;
+    background-color: var(--secondary);
+}
+
+.link-container{
+    height: fit-content;
+    padding: 1rem;
+    border-radius: 15px;
+    transition: all 0.25s ease-in-out;
+}
+
+.links{
+    width: 2rem;
+    overflow: hidden;
+
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    transition: all 0.15s ease-in-out;
+}
+
+.link-container:hover{
+    background-color: var(--accent);
+}
+
+.link-container:hover .links{
+    width: fit-content;
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.links .icon{
+    flex-shrink: 0;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.links .text{
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.link-container:hover .text{
+    opacity: 1;
+}
+
+
+.content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+nav{
+    display: flex;
+    flex-direction: row;
+    gap:2rem;
+}
+
+.link-container.active {
+    background-color: var(--accent);
+}
+
+/* mantém o link expandido igual hover */
+.link-container.active .links {
+    width: fit-content;
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* mostra o texto sempre */
+.link-container.active .text {
+    opacity: 1;
+}

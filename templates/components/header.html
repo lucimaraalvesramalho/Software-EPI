@@ -1,0 +1,28 @@
+<header>
+         <nav>
+            <div class="link-container {% if request.endpoint == 'api_routes.index' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.index') }}">
+                <span class="icon"><i class="fas fa-home"></i></span>
+                <span class="text">Início</span>
+            </a></div>
+            <div class="link-container {% if request.endpoint == 'api_routes.cadastro_funcionario' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.cadastro_funcionario') }}">
+                <span class="icon"><i class="fas fa-user-plus"></i></span>
+                <span class="text">Cadastrar Funcionário</span>
+            </a></div>
+            <div class="link-container {% if request.endpoint == 'api_routes.cadastro_epi' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.cadastro_epi') }}">
+                <span class="icon"><i class="fas fa-hard-hat"></i></span>
+                <span class="text">Cadastrar EPI</span>
+            </a></div>
+            <div class="link-container {% if request.endpoint == 'api_routes.criar_registro' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.criar_registro') }}">
+                <span class="icon"><i class="fas fa-file-medical"></i></span>
+                <span class="text">Criar novo registro</span>
+            </a></div>
+            <div class="link-container {% if request.endpoint == 'api_routes.atualizar_cadastros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.atualizar_cadastros') }}">
+                <span class="icon"><i class="fas fa-user-edit"></i></span>
+                <span class="text">Atualizar cadastros</span>
+            </a></div>
+            <div class="link-container {% if request.endpoint == 'api_routes.atualizar_registros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.atualizar_registros') }}">
+                <span class="icon"><i class="fas fa-edit"></i></span>
+                <span class="text">Atualizar registros</span>
+            </a></div>
+        </nav>
+    </header>

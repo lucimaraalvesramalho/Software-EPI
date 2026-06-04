@@ -1,0 +1,54 @@
+main{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cadastro{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: fit-content;
+    border: var(--primary) solid 2px;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+form{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+input{
+    border-radius: 5px;
+    height: 2rem;
+    width: 30vw;
+    text-align: center;
+    border: 1px black solid;
+    background-color: var(--tertiary);
+    color: var(--text-color);
+}
+
+button{
+    height: 2.5rem;
+    width: 25vw;
+    border-radius: 5px;
+    background-color: var(--secondary);
+    border: none;
+    transition: all 0.1s ease-in-out;
+}
+
+#theme-btn{
+    width: 5vw;
+    background-color: var(--primary);
+}
+
+button:hover{
+    background-color: var(--accent);
+    transform: translateY(1px);
+}

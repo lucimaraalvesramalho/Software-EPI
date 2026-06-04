@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Rota principal que retorna a página HTML de cadastro
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('cadastrar-funcionario.html')
 
 
 # Registra o blueprint de rotas após a criação do app e da função de conexão
