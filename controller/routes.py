@@ -295,7 +295,7 @@ def deletar_epi(ca_epi):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        sql = "DELETE FROM epis WHERE CA_epi = %s"
+        sql = "DELETE FROM epi WHERE certificado_aprovacao_epi = %s"
         cursor.execute(sql, (ca_epi,))
 
         conn.commit()
