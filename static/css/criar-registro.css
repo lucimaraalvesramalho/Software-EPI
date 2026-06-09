@@ -52,3 +52,10 @@ button:hover{
     background-color: var(--accent);
     transform: translateY(1px);
 }
+
+label{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: 100%
+}

@@ -12,15 +12,17 @@
     --accent: #824fe8;
     --text-color: #042016;
     --tertiary: #c9f1e7;
+    --input-border: #000000
 }
 
 .dark-theme{
     --bg-color: #0f1412;
     --primary: #1fd39a;
     --secondary: #5c63d6;
-    --accent: #7a4ae0;
+    --accent: #8c5fec;
     --text-color: #e9fff7;
     --tertiary: #1b2a25;
+    --input-border: #808080;
 }
 
 body{

@@ -52,7 +52,11 @@ def cadastrar_epi():
     cursor = None
     try:
         dados = request.get_json()
-        novo_epi = epi(dados['nome_epi'], dados['tipo_epi'], dados['certificado_aprovacao_epi'], dados['validade_certificado_aprovacao'])
+        novo_epi = epi(
+            dados['nome_epi'],
+            dados['tipo_epi'], 
+            dados['certificado_aprovacao_epi'], 
+            dados['validade_certificado_aprovacao'])
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -77,7 +81,14 @@ def cadastrar_registro():
     cursor = None
     try:
         dados = request.get_json()
-        registro = registros(dados['matricula_funcionario'], dados['ca_EPI'], dados['data_devolucao'], dados.get('data_troca'), dados.get('motivo_devolucao'))
+        registro = registros(
+            dados['matricula_funcionario'], 
+            dados['ca_EPI'],
+            None,
+            dados['data_devolucao'], 
+            dados.get('data_troca'),
+            dados.get('motivo_devolucao')
+        )
 
         conn = get_db_connection()
         cursor = conn.cursor()

@@ -15,9 +15,10 @@ class funcionario:
         self.data_admissao_funcionario = data_admissao_funcionario
     
 class registros:
-    def __init__(self, matricula_funcionario, ca_EPI, data_devolucao, data_troca, motivo_devolucao):
+    def __init__(self, matricula_funcionario, ca_EPI, data_entrega=None, data_devolucao=None, data_troca=None, motivo_devolucao=None):
         self.matricula_funcionario = matricula_funcionario
+        self.ca_EPI = ca_EPI
+        self.data_entrega = data_entrega
         self.data_devolucao = data_devolucao
         self.data_troca = data_troca
-        self.ca_EPI = ca_EPI
         self.motivo_devolucao = motivo_devolucao
