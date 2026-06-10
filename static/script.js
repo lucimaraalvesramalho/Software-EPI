@@ -84,3 +84,20 @@ if (registrosForm) {
         }
     });
 }
+
+async function buscarRegistros() {
+        const resposta = await fetch('/api/registro/');
+        const usuarios = await resposta.json();
+        const tbody = document.getElementById('registrosBody');
+        tbody.innerHTML = "";
+        
+        usuarios.forEach(usuario => {
+            tbody.innerHTML += `<tr>
+                <td>${usuario.matricula_funcionario}</td>
+                <td>${usuario.ca_EPI}</td>
+                <td>${usuario.data_devolucao}</td>
+                <td>${usuario.data_troca ?? ""}</td>
+                <td>${usuario.motivo_devolucao ?? ""}</td>
+            </tr>`;
+        });
+}

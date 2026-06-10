@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
+{% block extra_css %}<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/atualizar-registros.css') }}">{% endblock %}
 {% block content %}
+<button onclick="buscarRegistros()">
+    buscar registros
+</button>
+<table id="registrosTable">
+    <thead>
+        <tr>
+            <th>Matrícula do Funcionário</th>
+            <th>CA do EPI</th>
+            <th>Data para Devolução do EPI</th>
+        </tr>
+    </thead>
+    <tbody id="registrosBody">
+    </tbody>
+</table>
 
 {% endblock %}

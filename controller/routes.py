@@ -116,7 +116,7 @@ def buscar_funcionario():
     cursor = None
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
 
         if matricula:
             cursor.execute(
@@ -131,6 +131,8 @@ def buscar_funcionario():
             resultado = cursor.fetchall()
         
         conn.commit()
+        for funcionario in resultado if isinstance(resultado, list) else [resultado]:
+            funcionario['data_admissao_funcionario'] = funcionario['data_admissao_funcionario'].strftime('%Y-%m-%d') if funcionario['data_admissao_funcionario'] else None
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
@@ -147,7 +149,7 @@ def buscar_epi():
     cursor = None
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
 
         if ca:
             cursor.execute(
@@ -162,6 +164,50 @@ def buscar_epi():
             resultado = cursor.fetchall()
 
         conn.commit()
+
+        for epi in resultado:
+            epi['validade_certificado_aprovacao'] = epi['validade_certificado_aprovacao'].strftime('%Y-%m-%d') if epi['validade_certificado_aprovacao'] else None
+
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@api_routes.route('/api/registro/', methods=['GET'])
+def buscar_registro():
+    matricula = request.args.get("matricula")
+    ca = request.args.get("ca")
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if matricula:
+            cursor.execute(
+                "SELECT * FROM registros WHERE matricula_funcionario = %s", (matricula,)
+            )
+            resultado = cursor.fetchall()
+        elif ca:
+            cursor.execute(
+                "SELECT * FROM registros WHERE ca_EPI = %s", (ca,)
+            )
+            resultado = cursor.fetchall()
+        else:
+            cursor.execute(
+                "SELECT * FROM registros"
+            )
+            resultado = cursor.fetchall()
+
+        conn.commit()
+        for registro in resultado:
+            registro['data_entrega'] = registro['data_entrega'].strftime('%Y-%m-%d') if registro['data_entrega'] else None
+            registro['data_devolucao'] = registro['data_devolucao'].strftime('%Y-%m-%d') if registro['data_devolucao'] else None
+            registro['data_troca'] = registro['data_troca'].strftime('%Y-%m-%d') if registro['data_troca'] else None 
         return jsonify(resultado)
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
