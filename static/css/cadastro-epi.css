@@ -12,29 +12,34 @@ main{
     flex-direction: row;
     align-items: center;
     gap: 15px;
-    width: 50%;
-    height: 33vh;
+    width: fit-content;
+    height: fit-content;
+    max-height: fit-content;
     border: var(--primary) solid 2px;
     padding: 5px;
     border-radius: 25px;
     background-color: color-mix(in srgb, var(--secondary) 25%, transparent);
     box-shadow: var(--shadow);
-    padding: 0 1%;
-    transform: scale(1.1);
-    margin-top: 2%
+    padding: 1%;
 }
 
 .bg-img{
     padding: 0;
     margin: 0;
-    height: 90%;
     width: 100%;
-    background-image: url(/static/img/epi.jpg);
+    background-image: url(/static/img/funcionario.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
     border-radius: 15px;
     box-shadow: var(--img-shadow);
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+}
+
+#img-cont{
+    width: 45%;
 }
 
 p{
@@ -51,7 +56,6 @@ form{
     align-items: center;
     gap: 5px;
     margin: 0 1% 0 0;
-    transform: scale(0.9);
 }
 
 input{

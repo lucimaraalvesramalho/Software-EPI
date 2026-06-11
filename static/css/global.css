@@ -17,7 +17,7 @@
     --bg-table: #e9e7ff;
     --table-header:#b5ade8;
     --shadow: 0 0px 10px rgba(0, 0, 0, 0.162);;
-    --img-shadow: 8px 2px 12px rgba(0, 0, 0, 0.259)
+    --img-shadow: 2px 2px 12px rgba(0, 0, 0, 0.259)
 }
 
 .dark-theme{
@@ -32,7 +32,7 @@
     --bg-table: #1f1c36;
     --table-header:#2f2a5a;
     --shadow: 0 0px 10px rgba(255, 255, 255, 0.122);
-    --img-shadow: 6px 2px 15px rgba(255, 255, 255, 0.111);
+    --img-shadow: 2px 0px 8px rgba(255, 255, 255, 0.111);
 }
 
 body{
