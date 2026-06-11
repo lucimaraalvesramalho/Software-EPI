@@ -6,13 +6,17 @@ class epi:
         self.validade_certificado_aprovacao = validade_certificado_aprovacao
 
 class funcionario:
-    def __init__(self,matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario):
+    def __init__(self,matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp):
         self.matricula_funcionario = matricula_funcionario
         self.nome_funcionario = nome_funcionario
         self.cpf_funcionario = cpf_funcionario
         self.setor_funcionario = setor_funcionario
         self.funcao_funcionario = funcao_funcionario
         self.data_admissao_funcionario = data_admissao_funcionario
+        self.telefone = telefone
+        self.email = email
+        self.whatsapp = whatsapp
+
     
 class registros:
     def __init__(self, matricula_funcionario, ca_EPI, data_entrega=None, data_devolucao=None, data_troca=None, motivo_devolucao=None):

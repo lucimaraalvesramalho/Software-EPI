@@ -25,14 +25,17 @@ def cadastrar_funcionario():
             dados['cpf_funcionario'],
             dados['setor_funcionario'],
             dados['funcao_funcionario'],
-            dados['data_admissao_funcionario']
+            dados['data_admissao_funcionario'],
+            dados['telefone'],
+            dados['email'],
+            dados['whatsapp']
         )
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        sql = "INSERT INTO funcionarios (matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.execute(sql, (func.matricula_funcionario, func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario))
+        sql = "INSERT INTO funcionarios (matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        cursor.execute(sql, (func.matricula_funcionario, func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario, func.telefone, func.email, func.whatsapp))
 
         conn.commit()
 

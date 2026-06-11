@@ -6,25 +6,33 @@
 }
 
 :root{
-    --bg-color: #d5e9e3;
-    --primary: #34e5aa;
-    --secondary: #8187ee;
-    --accent: #824fe8;
+    --bg-color: #f3fffc;
+    --primary: #7d6cfdd9;
+    --secondary: rgba(107, 114, 239, 0.263);
+    --accent:  rgba(133, 79, 232, 0.618);
     --text-color: #042016;
-    --tertiary: #c9f1e7;
+    --tertiary: #e3e1ff;
     --input-border: #000000;
     --edit-color: #892222;
+    --bg-table: #e9e7ff;
+    --table-header:#b5ade8;
+    --shadow: 0 0px 10px rgba(0, 0, 0, 0.162);;
+    --img-shadow: 8px 2px 12px rgba(0, 0, 0, 0.259)
 }
 
 .dark-theme{
     --bg-color: #101312;
-    --primary: #1fd39a;
-    --secondary: #393d89;
-    --accent: #6444b0;
+    --primary: #5349ae;
+    --secondary: rgba(49, 53, 120, 0.425);
+    --accent: rgba(133, 79, 232, 0.32);
     --text-color: #e9fff7;
-    --tertiary: #1b2a25;
+    --tertiary: #191733;
     --input-border: #808080;
     --edit-color: #e37f7f;
+    --bg-table: #1f1c36;
+    --table-header:#2f2a5a;
+    --shadow: 0 0px 10px rgba(255, 255, 255, 0.122);
+    --img-shadow: 6px 2px 15px rgba(255, 255, 255, 0.111);
 }
 
 body{
@@ -52,6 +60,8 @@ header{
     border-radius: 30px;
     background-color: var(--secondary);
     transition: transform 0.3s ease;
+    backdrop-filter:blur(6px);
+    z-index: 100;
 }
 
 header.hide{
@@ -135,6 +145,7 @@ nav{
 
 .link-container.active {
     background-color: var(--accent);
+    box-shadow: var(--shadow);
 }
 
 /* mantém o link expandido igual hover */

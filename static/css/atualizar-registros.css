@@ -20,25 +20,22 @@ th, td {
     border-left: var(--radio-border) 1px solid;
     padding: 8px;
     text-align: left;
-    background: rgba(129,135,238,.18);
+    background: var(--bg-table);
     text-align: center;
 }
 
+
 th:first-child, td:first-child{
     border-left: none;
-
 }
 
 tr:last-child td{
     border-bottom:none;
 }
 
-tr.selected {
-    background: rgba(129,135,238,.25);
-}
-
 th {
-    background-color: var(--secondary);
+    background-color: var(--table-header);
+    padding: 10px;
 }
 
 
