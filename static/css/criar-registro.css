@@ -13,13 +13,15 @@ main{
     align-items: center;
     gap: 15px;
     width: 50%;
-    height: 70vh;
+    height: 32vh;
     border: var(--primary) solid 2px;
     padding: 5px;
     border-radius: 25px;
     background-color: color-mix(in srgb, var(--secondary) 25%, transparent);
     box-shadow: var(--shadow);
     padding: 0 1%;
+    margin-top: 3%;
+    transform: scale(1.1);
 }
 
 .bg-img{
@@ -27,7 +29,7 @@ main{
     margin: 0;
     height: 90%;
     width: 100%;
-    background-image: url(/static/img/funcionario.jpg);
+    background-image: url(/static/img/registros.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
