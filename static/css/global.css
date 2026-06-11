@@ -49,6 +49,11 @@ header{
     border: var(--secondary) 1px solid;
     border-radius: 30px;
     background-color: var(--secondary);
+    transition: transform 0.3s ease;
+}
+
+header.hide{
+    transform: translateY(200%)
 }
 
 .link-container{

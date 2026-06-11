@@ -12,6 +12,7 @@ table {
     overflow: hidden;
     border-spacing: 0;
     border: 1px var(--radio-border) solid;
+    margin-bottom: 15vh;
 }
 
 th, td {
