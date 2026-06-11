@@ -6,7 +6,7 @@
 }
 
 :root{
-    --bg-color: #ecfef8;
+    --bg-color: #d5e9e3;
     --primary: #34e5aa;
     --secondary: #8187ee;
     --accent: #824fe8;
@@ -16,10 +16,10 @@
 }
 
 .dark-theme{
-    --bg-color: #0f1412;
+    --bg-color: #101312;
     --primary: #1fd39a;
-    --secondary: #5c63d6;
-    --accent: #8c5fec;
+    --secondary: #393d89;
+    --accent: #6444b0;
     --text-color: #e9fff7;
     --tertiary: #1b2a25;
     --input-border: #808080;
@@ -106,6 +106,20 @@ header{
     align-items: center;
 }
 
+#theme-btn{
+    padding: 1.2rem 1.1rem 1rem 1.1rem;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+    font-size: medium;
+}
+
+.theme{
+    padding:0;
+}
+
 nav{
     display: flex;
     flex-direction: row;
@@ -126,4 +140,8 @@ nav{
 /* mostra o texto sempre */
 .link-container.active .text {
     opacity: 1;
+}
+
+input[type="date"]{
+    cursor: text;
 }

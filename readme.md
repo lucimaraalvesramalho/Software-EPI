@@ -21,8 +21,14 @@ models/
 ├── tables.py
 static/
 ├── css/
+│   ├── atualizar-registros.css
+│   ├── cadastro-epi.css
 │   ├── cadastro-funcionario.css
+│   ├── criar-registro.css
 │   └── global.css
+├── epis.js
+├── funcionarios.js
+├── registros.js
 ├── script.js
 templates/
 ├── atualizar-cadastros.html

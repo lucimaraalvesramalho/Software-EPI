@@ -32,28 +32,23 @@ form{
 input{
     border-radius: 5px;
     height: 2rem;
-    width: 30vw;
+    width: 25vw;
     text-align: center;
     border: 1px var(--input-border) solid;
     background-color: var(--tertiary);
     color: var(--text-color);
 }
 
-button{
+form button{
     height: 2.5rem;
     width: 25vw;
     border-radius: 5px;
     background-color: var(--secondary);
     border: none;
     transition: all 0.1s ease-in-out;
+    cursor: pointer;
 }
-
-#theme-btn{
-    width: 5vw;
-    background-color: var(--primary);
-}
-
-button:hover{
+form button:hover{
     background-color: var(--accent);
     transform: translateY(1px);
 }
