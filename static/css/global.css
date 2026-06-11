@@ -12,7 +12,8 @@
     --accent: #824fe8;
     --text-color: #042016;
     --tertiary: #c9f1e7;
-    --input-border: #000000
+    --input-border: #000000;
+    --edit-color: #892222;
 }
 
 .dark-theme{
@@ -23,6 +24,7 @@
     --text-color: #e9fff7;
     --tertiary: #1b2a25;
     --input-border: #808080;
+    --edit-color: #e57e7e;
 }
 
 body{

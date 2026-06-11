@@ -53,6 +53,8 @@ th {
 }
 
 #toolbar{
+    position: sticky;
+    top:5vh;
     max-height:0;
     margin:0;
     opacity: 0;
@@ -160,7 +162,7 @@ input{
     text-align: center;
     border: none;
     background: none;
-    color: var(--text-color);
+    color: var(--edit-color);
     margin: 0;
     padding: 6px;
     width: 70%;
