@@ -26,3 +26,12 @@ class registros:
         self.data_devolucao = data_devolucao
         self.data_troca = data_troca
         self.motivo_devolucao = motivo_devolucao
+
+class notificacao:
+    def __init__(self, ca_epi, matricula_funcionario, dias_para_vencimento, data_verificacao=None, enviado=False, data_envio=None):
+        self.ca_epi = ca_epi
+        self.matricula_funcionario = matricula_funcionario
+        self.dias_para_vencimento = dias_para_vencimento
+        self.data_verificacao = data_verificacao
+        self.enviado = enviado
+        self.data_envio = data_envio
