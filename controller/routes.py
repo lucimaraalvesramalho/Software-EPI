@@ -1,6 +1,7 @@
 ﻿from flask import Blueprint, render_template, request, jsonify
 from models.tables import funcionario, epi, registros
 from database import get_db_connection
+from datetime import datetime, timedelta
 
 # Blueprint para agrupar rotas da API
 api_routes = Blueprint('api_routes', __name__)
@@ -382,6 +383,211 @@ def deletar_registro(matricula, ca_epi):
 
         conn.commit()
         return jsonify({'message': 'Registro deletado com sucesso'}), 200
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+# ============ NOTIFICAÇÕES DE VENCIMENTO ============
+# Rotas para gerenciar notificações de vencimento de CA
+
+@api_routes.route('/api/notificacoes/verificar-vencimentos', methods=['POST'])
+def verificar_vencimentos():
+    """
+    Verifica todos os EPIs e calcula quantos dias faltam para o vencimento.
+    Cria notificações para aqueles que vencem em até 30 dias.
+    Espera JSON com: {"dias_alerta": 30} (opcional, padrão 30)
+    """
+    conn = None
+    cursor = None
+    try:
+        dados = request.get_json(silent=True) or {}
+        dias_alerta = dados.get('dias_alerta', 30)
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Buscar todos os EPIs com registros de funcionários
+        cursor.execute("""
+            SELECT DISTINCT r.ca_EPI, r.matricula_funcionario, e.validade_certificado_aprovacao
+            FROM registros r
+            JOIN epi e ON r.ca_EPI = e.certificado_aprovacao_epi
+            WHERE e.validade_certificado_aprovacao IS NOT NULL
+        """)
+        
+        registros_epi = cursor.fetchall()
+        notificacoes_criadas = 0
+        data_hoje = datetime.now()
+        
+        for reg in registros_epi:
+            ca_epi = reg['ca_EPI']
+            matricula = reg['matricula_funcionario']
+            data_vencimento = reg['validade_certificado_aprovacao']
+            
+            # Calcular dias para vencimento
+            dias_para_vencimento = (data_vencimento - data_hoje).days
+            
+            # Se vence em até dias_alerta dias e ainda não foi notificado
+            if 0 <= dias_para_vencimento <= dias_alerta:
+                # Verificar se já existe notificação não enviada
+                cursor.execute("""
+                    SELECT id FROM notificacoes_vencimento
+                    WHERE ca_epi = %s AND matricula_funcionario = %s AND enviado = FALSE
+                """, (ca_epi, matricula))
+                
+                if not cursor.fetchone():
+                    # Criar nova notificação
+                    cursor.execute("""
+                        INSERT INTO notificacoes_vencimento 
+                        (ca_epi, matricula_funcionario, dias_para_vencimento, data_verificacao, enviado)
+                        VALUES (%s, %s, %s, NOW(), FALSE)
+                    """, (ca_epi, matricula, dias_para_vencimento))
+                    notificacoes_criadas += 1
+        
+        conn.commit()
+        return jsonify({
+            'message': f'{notificacoes_criadas} notificação(ões) de vencimento criada(s)',
+            'notificacoes_criadas': notificacoes_criadas,
+            'dias_alerta': dias_alerta
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@api_routes.route('/api/notificacoes/pendentes', methods=['GET'])
+def obter_notificacoes_pendentes():
+    """
+    Retorna todas as notificações de vencimento que ainda não foram enviadas.
+    Opcional: passar matricula como query param para filtrar por funcionário
+    """
+    conn = None
+    cursor = None
+    try:
+        matricula = request.args.get("matricula")
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        if matricula:
+            cursor.execute("""
+                SELECT n.*, e.nome_epi, e.tipo_epi, 
+                       CONCAT(f.nome_funcionario, ' (', f.matricula_funcionario, ')') as funcionario_info,
+                       e.validade_certificado_aprovacao
+                FROM notificacoes_vencimento n
+                JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
+                JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
+                WHERE n.enviado = FALSE AND n.matricula_funcionario = %s
+                ORDER BY n.dias_para_vencimento ASC
+            """, (matricula,))
+        else:
+            cursor.execute("""
+                SELECT n.*, e.nome_epi, e.tipo_epi,
+                       CONCAT(f.nome_funcionario, ' (', f.matricula_funcionario, ')') as funcionario_info,
+                       e.validade_certificado_aprovacao
+                FROM notificacoes_vencimento n
+                JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
+                JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
+                WHERE n.enviado = FALSE
+                ORDER BY n.dias_para_vencimento ASC, n.data_verificacao DESC
+            """)
+        
+        notificacoes = cursor.fetchall()
+        
+        # Formatar datas
+        for notif in notificacoes:
+            notif['data_verificacao'] = notif['data_verificacao'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_verificacao'] else None
+            notif['data_envio'] = notif['data_envio'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_envio'] else None
+            notif['validade_certificado_aprovacao'] = notif['validade_certificado_aprovacao'].strftime('%Y-%m-%d') if notif['validade_certificado_aprovacao'] else None
+        
+        return jsonify({
+            'total': len(notificacoes),
+            'notificacoes': notificacoes
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@api_routes.route('/api/notificacoes/marcar-enviado/<int:notificacao_id>', methods=['PUT'])
+def marcar_notificacao_enviada(notificacao_id):
+    """
+    Marca uma notificação como enviada (útil após disparar a notificação para o usuário)
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE notificacoes_vencimento
+            SET enviado = TRUE, data_envio = NOW()
+            WHERE id = %s
+        """, (notificacao_id,))
+        
+        conn.commit()
+        
+        if cursor.rowcount == 0:
+            return jsonify({"erro": "Notificação não encontrada"}), 404
+        
+        return jsonify({'message': 'Notificação marcada como enviada'}), 200
+        
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@api_routes.route('/api/notificacoes/status', methods=['GET'])
+def status_notificacoes():
+    """
+    Retorna um resumo do status das notificações de vencimento
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Total de notificações pendentes
+        cursor.execute("SELECT COUNT(*) as pendentes FROM notificacoes_vencimento WHERE enviado = FALSE")
+        pendentes = cursor.fetchone()['pendentes']
+        
+        # Total de notificações enviadas
+        cursor.execute("SELECT COUNT(*) as enviadas FROM notificacoes_vencimento WHERE enviado = TRUE")
+        enviadas = cursor.fetchone()['enviadas']
+        
+        # EPIs com vencimento em até 7 dias
+        cursor.execute("""
+            SELECT COUNT(*) as criticos FROM notificacoes_vencimento
+            WHERE enviado = FALSE AND dias_para_vencimento <= 7
+        """)
+        criticos = cursor.fetchone()['criticos']
+        
+        return jsonify({
+            'pendentes': pendentes,
+            'enviadas': enviadas,
+            'criticos': criticos
+        }), 200
+        
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
     finally:
