@@ -72,7 +72,7 @@ header.hide{
     height: fit-content;
     padding: 1rem;
     border-radius: 15px;
-    transition: all 0.25s ease-in-out;
+    transition: all 0.35s ease-in-out;
 }
 
 .links{
@@ -88,7 +88,7 @@ header.hide{
     align-items: center;
     gap: 0.5rem;
 
-    transition: all 0.15s ease-in-out;
+    transition: all 0.25s ease-in-out;
 }
 
 .link-container:hover{
@@ -109,7 +109,7 @@ header.hide{
 .links .text{
     opacity: 0;
     white-space: nowrap;
-    transition: opacity 0.15s ease-in-out;
+    transition: opacity 0.35s ease-in-out;
 }
 
 .link-container:hover .text{
@@ -128,7 +128,7 @@ header.hide{
     border-radius: 5px;
     background: none;
     border: none;
-    transition: all 0.1s ease-in-out;
+    transition: all 0.3s ease-in-out;
     cursor: pointer;
     font-size: medium;
 }

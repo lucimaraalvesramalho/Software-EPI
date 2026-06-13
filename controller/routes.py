@@ -1,4 +1,5 @@
 ﻿from flask import Blueprint, render_template, request, jsonify
+import matplotlib.pyplot as plt
 from models.tables import funcionario, epi, registros
 from database import get_db_connection
 from datetime import datetime, timedelta
@@ -597,6 +598,8 @@ def status_notificacoes():
             conn.close()
 
 
+# ============ ROTAS PARA ARMAZENAR OS CAS VENCENDO ============
+
 # HTML ROUTES - Rotas para renderizar as páginas HTML
 @api_routes.route('/index')
 def index():
@@ -621,3 +624,37 @@ def atualizar_registros():
 @api_routes.route('/atualizar-cadastros')
 def atualizar_cadastros():
     return render_template('atualizar-cadastros.html')
+
+# ============ GERAÇÃO DE GRÁFICOS ============
+# Gera gráficos para serem usados nno frontend
+
+@api_routes.route('/api/graficos/devolucao')
+def gerarGrafico():
+    conn = None
+    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) from registros where data_troca is not null")
+    devolvidos = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM registros where data_troca is null")
+    nao_devolvidos = cursor.fetchone()[0]
+
+    plt.pie(
+        [devolvidos, nao_devolvidos],
+        labels=['Devolvidos', 'Não devolvidos'],
+        autopct='%1.1f%%'
+    )
+
+    plt.title('Situação dos EPIs')
+    plt.savefig('static/grafico.png')
+    plt.close()
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'grafico gerado com sucesso'}), 200
+
+# @api_routes.route('/api/graficos/')
