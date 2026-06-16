@@ -884,7 +884,7 @@ def _enviar_notificacoes_por_tipo(tipo_envio, dados=None):
 # ============ ROTAS DE HTML ============
 
 # HTML ROUTES - Rotas para renderizar as páginas HTML
-@api_routes.route('/index')
+@api_routes.route('/')
 def index():
     return render_template('index.html')
 

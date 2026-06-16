@@ -5,7 +5,7 @@
     --radio-border: rgba(129,135,238,.6);
 }
 
-table {
+table{
     width: 100%;
     border-collapse: separate;
     border-radius: 12px;
@@ -17,8 +17,8 @@ table {
 
 th, td {
     border-bottom: var(--radio-border) 1px solid;
-    border-left: var(--radio-border) 1px solid;
-    padding: 8px;
+    border-left: none;
+    padding: 8px 20px;
     text-align: left;
     background: var(--bg-table);
     text-align: center;
