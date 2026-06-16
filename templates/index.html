@@ -1,4 +1,132 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-container">
+    <div class="dashboard-header">
+        <div>
+            <p class="eyebrow">Painel principal</p>
+            <h1>Controle de EPIs</h1>
+        </div>
+        <a href="{{ url_for('api_routes.criar_registro') }}" class="btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Novo registro
+        </a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+                <span>Total de EPIs</span>
+                <strong>{{ dashboard.total_epi }}</strong>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
+            <div>
+                <span>Funcionários</span>
+                <strong>{{ dashboard.total_funcionarios }}</strong>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-clipboard-list"></i></div>
+            <div>
+                <span>Registros hoje</span>
+                <strong>{{ dashboard.registros_hoje }}</strong>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon orange"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div>
+                <span>Vencendo em 7 dias</span>
+                <strong>{{ dashboard.vencendo_7_dias }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <section class="panel panel-large chart-panel">
+            <div class="panel-header">
+                <h2>EPIs devolvidos</h2>
+                <span>Situação geral</span>
+            </div>
+            <div class="chart-wrapper">
+                <img src="{{ url_for('api_routes.gerarGrafico') }}" alt="Gráfico de devolução de EPIs" class="chart-image">
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Notificações</h2>
+                <a href="#">Ver tudo</a>
+            </div>
+            <ul class="notification-list">
+                <li>
+                    <span class="dot warning"></span>
+                    <div>
+                        <strong>3 EPIs vencem hoje</strong>
+                        <p>Atualize os registros para evitar atrasos.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="dot success"></span>
+                    <div>
+                        <strong>12 entregas concluídas</strong>
+                        <p>Hoje já foram registrados 12 itens.</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="dot info"></span>
+                    <div>
+                        <strong>Nova atualização</strong>
+                        <p>O painel foi ajustado com novas métricas.</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </div>
+
+    <section class="panel table-panel">
+        <div class="panel-header">
+            <h2>Últimos registros</h2>
+            <a href="#">Exportar</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Funcionário</th>
+                        <th>EPI</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ana Silva</td>
+                        <td>Capacete</td>
+                        <td>16/06/2026</td>
+                        <td><span class="badge success">OK</span></td>
+                    </tr>
+                    <tr>
+                        <td>João Pereira</td>
+                        <td>Botina</td>
+                        <td>15/06/2026</td>
+                        <td><span class="badge warning">Atento</span></td>
+                    </tr>
+                    <tr>
+                        <td>Maria Costa</td>
+                        <td>Óculos</td>
+                        <td>14/06/2026</td>
+                        <td><span class="badge success">OK</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
 {% endblock %}

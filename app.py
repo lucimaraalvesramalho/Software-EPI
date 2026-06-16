@@ -3,13 +3,43 @@ from database import get_db_connection
 
 app = Flask(__name__)
 
-# Rota principal que retorna a página HTML de cadastro
+
+def get_dashboard_stats():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT COUNT(*) AS total FROM epi")
+        total_epi = cursor.fetchone()['total']
+
+        cursor.execute("SELECT COUNT(*) AS total FROM funcionarios")
+        total_funcionarios = cursor.fetchone()['total']
+
+        cursor.execute("SELECT COUNT(*) AS total FROM registros WHERE data_entrega = CURDATE()")
+        registros_hoje = cursor.fetchone()['total']
+
+        cursor.execute(
+            "SELECT COUNT(*) AS total FROM notificacoes_vencimento WHERE enviado = FALSE AND dias_para_vencimento <= 7"
+        )
+        vencendo_7_dias = cursor.fetchone()['total']
+
+        return {
+            'total_epi': total_epi,
+            'total_funcionarios': total_funcionarios,
+            'registros_hoje': registros_hoje,
+            'vencendo_7_dias': vencendo_7_dias,
+        }
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @app.route('/')
 def home():
-    return render_template('cadastrar-funcionario.html')
+    dashboard = get_dashboard_stats()
+    return render_template('index.html', dashboard=dashboard)
 
 
-# Registra o blueprint de rotas após a criação do app e da função de conexão
 from controller.routes import api_routes
 app.register_blueprint(api_routes)
 

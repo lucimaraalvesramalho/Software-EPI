@@ -15,10 +15,10 @@ main{
     gap: 15px;
     width: fit-content;
     height: fit-content;
-    border: var(--primary) solid 2px;
+    border: none;
     padding: 5px;
     border-radius: 25px;
-    background-color: color-mix(in srgb, var(--secondary) 25%, transparent);
+    background-color: var(--bg-color);
     box-shadow: var(--shadow);
     padding: 0 1%;
 }
@@ -41,7 +41,7 @@ input{
     height: 1.6rem;
     width: 25vw;
     text-align: center;
-    border: 1px var(--input-border) solid;
+    border:none;
     background-color: var(--tertiary);
     color: var(--text-color);
 }
@@ -56,7 +56,6 @@ input{
     background-size: cover;
     background-position: center;
     border-radius: 15px;
-    box-shadow: var(--img-shadow);
     object-fit: cover;
     user-select: none;
     pointer-events: none;

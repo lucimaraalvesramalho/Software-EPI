@@ -1,12 +1,20 @@
-﻿from flask import Blueprint, render_template, request, jsonify
+﻿# Importação das bibliotecas utilizadas no backend
+from flask import Blueprint, render_template, request, jsonify, send_file
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from io import BytesIO
 from models.tables import funcionario, epi, registros
 from database import get_db_connection
 from datetime import datetime, timedelta
+import json
 import os
 import re
 from dotenv import load_dotenv
 from twilio.rest import Client
+
+# Carrega variáveis do ambiente
+load_dotenv()
 
 # Blueprint para agrupar rotas da API
 api_routes = Blueprint('api_routes', __name__)
@@ -14,16 +22,17 @@ api_routes = Blueprint('api_routes', __name__)
 def formatar_para_twilio(telefone_raw):
     if not telefone_raw:
         return ""
-    # Remove qualquer caractere que não seja número (parênteses, traços, espaços)
+    # Remove qualquer caractere que não seja número
     numeros = re.sub(r'\D', '', str(telefone_raw))
-    
-    # Regra 1: Se tem 11 dígitos (DDD + 9 dígitos), assume Brasil e insere +55
+
+    # Formata número brasileiro
     if len(numeros) == 11:
         return f"+55{numeros}"
-    # Regra 2: Se já tem 13 dígitos (55 + DDD + número), adiciona apenas o +
+    # Formata número já com código do país
     elif len(numeros) == 13:
         return f"+{numeros}"
-    
+
+    # Retorna como está caso não tenha padrão
     return numeros
 
 
@@ -32,13 +41,17 @@ def formatar_para_twilio(telefone_raw):
 
 @api_routes.route('/api/funcionario', methods=['POST'])
 def cadastrar_funcionario():
+    # Cadastra um novo funcionário
     conn = None
     cursor = None
     try:
+        # Pega os dados enviados
         dados = request.get_json(silent=True)
         if not dados:
+            # Fallback para formulário
             dados = request.form.to_dict()
 
+        # Cria objeto do funcionário
         func = funcionario(
             dados['matricula_funcionario'],
             dados['nome_funcionario'],
@@ -51,12 +64,15 @@ def cadastrar_funcionario():
             dados['whatsapp']
         )
 
+        # Conecta ao banco
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Insere os dados do funcionário
         sql = "INSERT INTO funcionarios (matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
         cursor.execute(sql, (func.matricula_funcionario, func.nome_funcionario, func.cpf_funcionario, func.setor_funcionario, func.funcao_funcionario, func.data_admissao_funcionario, func.telefone, func.email, func.whatsapp))
 
+        # Confirma a operação
         conn.commit()
 
         return jsonify({'message': 'Funcionário cadastrado com sucesso'}), 201
@@ -71,22 +87,29 @@ def cadastrar_funcionario():
 
 @api_routes.route('/api/epi', methods=['POST'])
 def cadastrar_epi():
+    # Cadastra um novo EPI
     conn = None
     cursor = None
     try:
+        # Pega os dados do EPI
         dados = request.get_json()
+
+        # Cria objeto do EPI
         novo_epi = epi(
             dados['nome_epi'],
             dados['tipo_epi'], 
             dados['certificado_aprovacao_epi'], 
             dados['validade_certificado_aprovacao'])
 
+        # Conecta ao banco
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Insere o EPI
         sql = "INSERT INTO epi (nome_epi, tipo_epi, certificado_aprovacao_epi, validade_certificado_aprovacao) VALUES (%s, %s, %s, %s)"
         cursor.execute(sql, (novo_epi.nome_epi, novo_epi.tipo_epi, novo_epi.certificado_aprovacao_epi, novo_epi.validade_certificado_aprovacao))
 
+        # Confirma a operação
         conn.commit()
         return jsonify({'message': 'EPI cadastrado com sucesso'}), 201
     except Exception as e:
@@ -100,10 +123,14 @@ def cadastrar_epi():
 
 @api_routes.route('/api/registro', methods=['POST'])
 def cadastrar_registro():
+    # Cadastra um novo registro
     conn = None
     cursor = None
     try:
+        # Pega os dados do registro
         dados = request.get_json()
+
+        # Cria objeto do registro
         registro = registros(
             dados['matricula_funcionario'], 
             dados['ca_EPI'],
@@ -113,12 +140,15 @@ def cadastrar_registro():
             dados.get('motivo_devolucao')
         )
 
+        # Conecta ao banco
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Insere o registro
         sql = "INSERT INTO registros (matricula_funcionario, ca_EPI, data_devolucao, data_troca, motivo_devolucao) VALUES (%s, %s, %s, %s, %s)"
         cursor.execute(sql, (registro.matricula_funcionario, registro.ca_EPI, registro.data_devolucao, registro.data_troca, registro.motivo_devolucao))
 
+        # Confirma a operação
         conn.commit()
         return jsonify({'message': 'Registro cadastrado com sucesso'}), 201
     except Exception as e:
@@ -134,6 +164,7 @@ def cadastrar_registro():
 
 @api_routes.route('/api/funcionario/', methods=['GET'])
 def buscar_funcionario():
+    # Busca funcionários
     matricula = request.args.get("matricula")
     conn = None
     cursor = None
@@ -141,19 +172,22 @@ def buscar_funcionario():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Busca por matrícula ou lista tudo
         if matricula:
             cursor.execute(
                 "SELECT * FROM funcionarios WHERE matricula_funcionario = %s", (matricula,)
             )
             resultado = cursor.fetchone()
-
         else:
             cursor.execute(
                 "SELECT * FROM funcionarios"
             )
             resultado = cursor.fetchall()
-        
+
+        # Confirma a conexão
         conn.commit()
+
+        # Formata datas para JSON
         for funcionario in resultado if isinstance(resultado, list) else [resultado]:
             funcionario['data_admissao_funcionario'] = funcionario['data_admissao_funcionario'].strftime('%Y-%m-%d') if funcionario['data_admissao_funcionario'] else None
         return jsonify(resultado)
@@ -167,6 +201,7 @@ def buscar_funcionario():
 
 @api_routes.route('/api/epi/', methods=['GET'])
 def buscar_epi():
+    # Busca EPIs
     ca = request.args.get("ca")
     conn = None
     cursor = None
@@ -174,20 +209,22 @@ def buscar_epi():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Busca por CA ou lista tudo
         if ca:
             cursor.execute(
                 "SELECT * FROM epi WHERE certificado_aprovacao_epi = %s", (ca,)
             )
             resultado = cursor.fetchone()
-        
         else:
             cursor.execute(
                 "SELECT * FROM epi"
             )
             resultado = cursor.fetchall()
 
+        # Confirma a conexão
         conn.commit()
 
+        # Formata datas para JSON
         for epi in resultado:
             epi['validade_certificado_aprovacao'] = epi['validade_certificado_aprovacao'].strftime('%Y-%m-%d') if epi['validade_certificado_aprovacao'] else None
 
@@ -202,6 +239,7 @@ def buscar_epi():
 
 @api_routes.route('/api/registro/', methods=['GET'])
 def buscar_registro():
+    # Busca registros
     matricula = request.args.get("matricula")
     ca = request.args.get("ca")
     conn = None
@@ -210,6 +248,7 @@ def buscar_registro():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Busca por matrícula, CA ou lista tudo
         if matricula:
             cursor.execute(
                 "SELECT * FROM registros WHERE matricula_funcionario = %s", (matricula,)
@@ -226,7 +265,10 @@ def buscar_registro():
             )
             resultado = cursor.fetchall()
 
+        # Confirma a conexão
         conn.commit()
+
+        # Formata datas para JSON
         for registro in resultado:
             registro['data_entrega'] = registro['data_entrega'].strftime('%Y-%m-%d') if registro['data_entrega'] else None
             registro['data_devolucao'] = registro['data_devolucao'].strftime('%Y-%m-%d') if registro['data_devolucao'] else None
@@ -246,6 +288,7 @@ def buscar_registro():
 
 @api_routes.route('/api/funcionario/<matricula>', methods=['PUT'])
 def atualizar_funcionario(matricula):
+    # Atualiza funcionário
     conn = None
     cursor = None
     try:
@@ -280,6 +323,7 @@ def atualizar_funcionario(matricula):
 
 @api_routes.route('/api/epi/<ca_epi>', methods=['PUT'])
 def atualizar_epi(ca_epi):
+    # Atualiza EPI
     conn = None
     cursor = None
     try:
@@ -312,6 +356,7 @@ def atualizar_epi(ca_epi):
 
 @api_routes.route('/api/registro/<matricula>/<ca_epi>', methods=['PUT'])
 def atualizar_registro(matricula, ca_epi):
+    # Atualiza registro
     conn = None
     cursor = None
     try:
@@ -347,6 +392,7 @@ def atualizar_registro(matricula, ca_epi):
 
 @api_routes.route('/api/funcionario/<matricula>', methods=['DELETE'])
 def deletar_funcionario(matricula):
+    # Remove funcionário
     conn = None
     cursor = None
     try:
@@ -369,6 +415,7 @@ def deletar_funcionario(matricula):
 
 @api_routes.route('/api/epi/<ca_epi>', methods=['DELETE'])
 def deletar_epi(ca_epi):
+    # Remove EPI
     conn = None
     cursor = None
     try:
@@ -391,6 +438,7 @@ def deletar_epi(ca_epi):
 
 @api_routes.route('/api/registro/<matricula>/<ca_epi>', methods=['DELETE'])
 def deletar_registro(matricula, ca_epi):
+    # Remove registro
     conn = None
     cursor = None
     try:
@@ -444,18 +492,23 @@ def verificar_vencimentos():
 
         registros_epi = cursor.fetchall()
         notificacoes_criadas = 0
+        # Data atual para cálculo
         data_hoje = datetime.now().date()
 
+        # Percorre os registros para montar alertas
         for reg in registros_epi:
             data_vencimento = reg['validade_certificado_aprovacao']
             if not data_vencimento:
                 continue
 
+            # Calcula quantos dias faltam
             dias_para_vencimento = (data_vencimento - data_hoje).days
 
+            # Ignora vencidos ou fora do limite
             if dias_para_vencimento < 0 or dias_para_vencimento > dias_alerta:
                 continue
 
+            # Verifica se já existe alerta pendente
             cursor.execute(
                 """
                 SELECT id
@@ -470,6 +523,7 @@ def verificar_vencimentos():
             if cursor.fetchone():
                 continue
 
+            # Cria nova notificação pendente
             cursor.execute(
                 """
                 INSERT INTO notificacoes_vencimento
@@ -561,8 +615,10 @@ def obter_notificacoes_pendentes():
                 """
             )
 
+        # Pega as notificações pendentes
         notificacoes = cursor.fetchall()
 
+        # Formata datas para resposta
         for notif in notificacoes:
             notif['data_verificacao'] = notif['data_verificacao'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_verificacao'] else None
             notif['data_envio'] = notif['data_envio'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_envio'] else None
@@ -658,35 +714,35 @@ def status_notificacoes():
             conn.close()
 
 
-@api_routes.route('/api/notificacoes/enviar-sms', methods=['POST'])
-def enviar_notificacoes_sms():
+@api_routes.route('/api/notificacoes/enviar', methods=['POST'])
+def enviar_notificacoes():
     """
-    Envia as notificações pendentes por SMS.
+    Envia as notificações pendentes.
     Body opcional:
+      - tipo: 'sms' ou 'whatsapp'
       - destinatario: número específico para sobrescrever o destino
       - matricula: filtra uma matrícula específica
+      - content_sid: SID do template do WhatsApp (se existir)
     """
-    return _enviar_notificacoes_por_tipo('sms')
+    dados = request.get_json(silent=True) or {}
+    tipo_envio = dados.get('tipo', 'sms').lower()
+
+    if tipo_envio not in ('sms', 'whatsapp'):
+        return jsonify({"erro": "tipo deve ser 'sms' ou 'whatsapp'"}), 400
+
+    return _enviar_notificacoes_por_tipo(tipo_envio, dados)
 
 
-@api_routes.route('/api/notificacoes/enviar-whatsapp', methods=['POST'])
-def enviar_notificacoes_whatsapp():
-    """
-    Envia as notificações pendentes por WhatsApp.
-    Body opcional:
-      - destinatario: número específico para sobrescrever o destino
-      - matricula: filtra uma matrícula específica
-    """
-    return _enviar_notificacoes_por_tipo('whatsapp')
-
-
-def _enviar_notificacoes_por_tipo(tipo_envio):
+def _enviar_notificacoes_por_tipo(tipo_envio, dados=None):
     conn = None
     cursor = None
     try:
-        dados = request.get_json(silent=True) or {}
+        if dados is None:
+            dados = request.get_json(silent=True) or {}
+
         matricula = dados.get('matricula')
         destinatario = dados.get('destinatario')
+        content_sid = dados.get('content_sid') or os.getenv('TWILIO_CONTENT_SID')
 
         account_sid = os.getenv('TWILIO_ACCOUNT_SID')
         auth_token = os.getenv('TWILIO_AUTH_TOKEN')
@@ -750,10 +806,13 @@ def _enviar_notificacoes_por_tipo(tipo_envio):
                 """
             )
 
+        # Busca notificações pendentes
         notificacoes = cursor.fetchall()
         contador_sucesso = 0
 
+        # Envia cada notificação
         for notif in notificacoes:
+            # Define para onde mandar
             telefone_destino = formatar_para_twilio(
                 destinatario or notif.get('whatsapp') or notif.get('telefone')
             )
@@ -761,18 +820,31 @@ def _enviar_notificacoes_por_tipo(tipo_envio):
             if not telefone_destino:
                 continue
 
+            # Monta a mensagem
             mensagem = (
                 f"Olá {notif['nome_funcionario']}, o EPI {notif['nome_epi']} "
                 f"(CA {notif['ca_epi']}) vence em {notif['dias_para_vencimento']} dias. "
                 f"Validade: {notif['validade_certificado_aprovacao']}"
             )
 
+            # Envia por SMS ou WhatsApp
             if tipo_envio == 'whatsapp':
-                client.messages.create(
-                    body=mensagem,
-                    from_=f"whatsapp:{whatsapp_from}",
-                    to=f"whatsapp:{telefone_destino}"
-                )
+                payload = {
+                    'from_': f"whatsapp:{whatsapp_from}",
+                    'to': f"whatsapp:{telefone_destino}"
+                }
+
+                # Se houver template do Twilio, usa o formato recomendado
+                if content_sid:
+                    payload['content_sid'] = content_sid
+                    payload['content_variables'] = json.dumps({
+                        '1': notif['validade_certificado_aprovacao'],
+                        '2': str(notif['dias_para_vencimento'])
+                    })
+                else:
+                    payload['body'] = mensagem
+
+                client.messages.create(**payload)
             else:
                 client.messages.create(
                     body=mensagem,
@@ -780,6 +852,7 @@ def _enviar_notificacoes_por_tipo(tipo_envio):
                     to=telefone_destino
                 )
 
+            # Marca como enviada
             cursor.execute(
                 """
                 UPDATE notificacoes_vencimento
@@ -790,6 +863,7 @@ def _enviar_notificacoes_por_tipo(tipo_envio):
             )
             contador_sucesso += 1
 
+        # Confirma as mudanças
         conn.commit()
         return jsonify({
             'message': f'Processamento concluído. {contador_sucesso} notificação(ões) enviada(s) por {tipo_envio}',
@@ -805,15 +879,6 @@ def _enviar_notificacoes_por_tipo(tipo_envio):
             cursor.close()
         if conn:
             conn.close()
-
-
-@api_routes.route('/api/notificar-vencimentos', methods=['POST'])
-def notificar_vencimentos_compat():
-    dados = request.get_json(silent=True) or {}
-    tipo = dados.get('tipo', 'sms')
-    if tipo == 'whatsapp':
-        return enviar_notificacoes_whatsapp()
-    return enviar_notificacoes_sms()
 
 
 # ============ ROTAS DE HTML ============
@@ -850,29 +915,48 @@ def atualizar_cadastros():
 def gerarGrafico():
     conn = None
     cursor = None
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) from registros where data_troca is not null")
-    devolvidos = cursor.fetchone()[0]
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM registros where data_troca is null")
-    nao_devolvidos = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NOT NULL")
+        devolvidos = cursor.fetchone()[0]
 
-    plt.pie(
-        [devolvidos, nao_devolvidos],
-        labels=['Devolvidos', 'Não devolvidos'],
-        autopct='%1.1f%%'
-    )
+        cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NULL")
+        nao_devolvidos = cursor.fetchone()[0]
 
-    plt.title('Situação dos EPIs')
-    plt.savefig('static/grafico.png')
-    plt.close()
-    
-    conn.commit()
-    cursor.close()
-    conn.close()
+        fig, ax = plt.subplots(figsize=(6, 4), facecolor='#f8f7ff')
+        ax.set_facecolor('#f8f7ff')
 
-    return jsonify({'message': 'grafico gerado com sucesso'}), 200
+        ax.pie(
+            [devolvidos, nao_devolvidos],
+            labels=['Devolvidos', 'Não devolvidos'],
+            autopct='%1.1f%%',
+            startangle=90,
+            colors=['#7d6cfd', '#f59e0b'],
+            wedgeprops={'edgecolor': '#f8f7ff', 'linewidth': 1.5},
+            textprops={'color': '#042016', 'fontsize': 10}
+        )
+
+        ax.set_title('Situação dos EPIs', color='#042016', fontsize=12, pad=12)
+        ax.axis('equal')
+
+        buffer = BytesIO()
+        fig.savefig(buffer, format='png', bbox_inches='tight', dpi=150)
+        buffer.seek(0)
+        plt.close(fig)
+
+        return send_file(
+            buffer,
+            mimetype='image/png'
+        )
+    except Exception as e:
+        return jsonify({'erro': str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # @api_routes.route('/api/graficos/')
