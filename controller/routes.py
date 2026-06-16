@@ -3,14 +3,32 @@ import matplotlib.pyplot as plt
 from models.tables import funcionario, epi, registros
 from database import get_db_connection
 from datetime import datetime, timedelta
+import os
+import re
+from dotenv import load_dotenv
+from twilio.rest import Client
 
 # Blueprint para agrupar rotas da API
 api_routes = Blueprint('api_routes', __name__)
 
+def formatar_para_twilio(telefone_raw):
+    if not telefone_raw:
+        return ""
+    # Remove qualquer caractere que não seja número (parênteses, traços, espaços)
+    numeros = re.sub(r'\D', '', str(telefone_raw))
+    
+    # Regra 1: Se tem 11 dígitos (DDD + 9 dígitos), assume Brasil e insere +55
+    if len(numeros) == 11:
+        return f"+55{numeros}"
+    # Regra 2: Se já tem 13 dígitos (55 + DDD + número), adiciona apenas o +
+    elif len(numeros) == 13:
+        return f"+{numeros}"
+    
+    return numeros
+
 
 # ============ CREATE ============
 # Definição das rotas para cadastro de funcionários, EPIs e registros
-
 
 @api_routes.route('/api/funcionario', methods=['POST'])
 def cadastrar_funcionario():
@@ -396,66 +414,79 @@ def deletar_registro(matricula, ca_epi):
 # ============ NOTIFICAÇÕES DE VENCIMENTO ============
 # Rotas para gerenciar notificações de vencimento de CA
 
-@api_routes.route('/api/notificacoes/verificar-vencimentos', methods=['POST'])
+@api_routes.route('/api/notificacoes/verificar', methods=['POST'])
 def verificar_vencimentos():
     """
-    Verifica todos os EPIs e calcula quantos dias faltam para o vencimento.
-    Cria notificações para aqueles que vencem em até 30 dias.
+    Verifica os EPIs que vencem nos próximos dias e grava as notificações
+    pendentes na tabela notificacoes_vencimento.
     Espera JSON com: {"dias_alerta": 30} (opcional, padrão 30)
     """
     conn = None
     cursor = None
     try:
         dados = request.get_json(silent=True) or {}
-        dias_alerta = dados.get('dias_alerta', 30)
-        
+        dias_alerta = int(dados.get('dias_alerta', 30))
+
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
-        # Buscar todos os EPIs com registros de funcionários
+
         cursor.execute("""
-            SELECT DISTINCT r.ca_EPI, r.matricula_funcionario, e.validade_certificado_aprovacao
+            SELECT
+                r.matricula_funcionario,
+                r.ca_EPI,
+                e.nome_epi,
+                e.tipo_epi,
+                e.validade_certificado_aprovacao
             FROM registros r
             JOIN epi e ON r.ca_EPI = e.certificado_aprovacao_epi
             WHERE e.validade_certificado_aprovacao IS NOT NULL
         """)
-        
+
         registros_epi = cursor.fetchall()
         notificacoes_criadas = 0
-        data_hoje = datetime.now()
-        
+        data_hoje = datetime.now().date()
+
         for reg in registros_epi:
-            ca_epi = reg['ca_EPI']
-            matricula = reg['matricula_funcionario']
             data_vencimento = reg['validade_certificado_aprovacao']
-            
-            # Calcular dias para vencimento
+            if not data_vencimento:
+                continue
+
             dias_para_vencimento = (data_vencimento - data_hoje).days
-            
-            # Se vence em até dias_alerta dias e ainda não foi notificado
-            if 0 <= dias_para_vencimento <= dias_alerta:
-                # Verificar se já existe notificação não enviada
-                cursor.execute("""
-                    SELECT id FROM notificacoes_vencimento
-                    WHERE ca_epi = %s AND matricula_funcionario = %s AND enviado = FALSE
-                """, (ca_epi, matricula))
-                
-                if not cursor.fetchone():
-                    # Criar nova notificação
-                    cursor.execute("""
-                        INSERT INTO notificacoes_vencimento 
-                        (ca_epi, matricula_funcionario, dias_para_vencimento, data_verificacao, enviado)
-                        VALUES (%s, %s, %s, NOW(), FALSE)
-                    """, (ca_epi, matricula, dias_para_vencimento))
-                    notificacoes_criadas += 1
-        
+
+            if dias_para_vencimento < 0 or dias_para_vencimento > dias_alerta:
+                continue
+
+            cursor.execute(
+                """
+                SELECT id
+                FROM notificacoes_vencimento
+                WHERE ca_epi = %s
+                  AND matricula_funcionario = %s
+                  AND enviado = FALSE
+                """,
+                (reg['ca_EPI'], reg['matricula_funcionario'])
+            )
+
+            if cursor.fetchone():
+                continue
+
+            cursor.execute(
+                """
+                INSERT INTO notificacoes_vencimento
+                (ca_epi, matricula_funcionario, dias_para_vencimento, data_verificacao, enviado)
+                VALUES (%s, %s, %s, NOW(), FALSE)
+                """,
+                (reg['ca_EPI'], reg['matricula_funcionario'], dias_para_vencimento)
+            )
+            notificacoes_criadas += 1
+
         conn.commit()
         return jsonify({
             'message': f'{notificacoes_criadas} notificação(ões) de vencimento criada(s)',
             'notificacoes_criadas': notificacoes_criadas,
             'dias_alerta': dias_alerta
         }), 200
-        
+
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
     finally:
@@ -469,52 +500,79 @@ def verificar_vencimentos():
 def obter_notificacoes_pendentes():
     """
     Retorna todas as notificações de vencimento que ainda não foram enviadas.
-    Opcional: passar matricula como query param para filtrar por funcionário
+    Opcional: passar matricula como query param para filtrar por funcionário.
     """
     conn = None
     cursor = None
     try:
-        matricula = request.args.get("matricula")
-        
+        matricula = request.args.get('matricula')
+
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
+
         if matricula:
-            cursor.execute("""
-                SELECT n.*, e.nome_epi, e.tipo_epi, 
-                       CONCAT(f.nome_funcionario, ' (', f.matricula_funcionario, ')') as funcionario_info,
-                       e.validade_certificado_aprovacao
+            cursor.execute(
+                """
+                SELECT
+                    n.id,
+                    n.ca_epi,
+                    n.matricula_funcionario,
+                    n.dias_para_vencimento,
+                    n.data_verificacao,
+                    n.enviado,
+                    n.data_envio,
+                    e.nome_epi,
+                    e.tipo_epi,
+                    e.validade_certificado_aprovacao,
+                    f.nome_funcionario,
+                    f.telefone,
+                    f.whatsapp
                 FROM notificacoes_vencimento n
                 JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
                 JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
-                WHERE n.enviado = FALSE AND n.matricula_funcionario = %s
-                ORDER BY n.dias_para_vencimento ASC
-            """, (matricula,))
+                WHERE n.enviado = FALSE
+                  AND n.matricula_funcionario = %s
+                ORDER BY n.dias_para_vencimento ASC, n.data_verificacao DESC
+                """,
+                (matricula,)
+            )
         else:
-            cursor.execute("""
-                SELECT n.*, e.nome_epi, e.tipo_epi,
-                       CONCAT(f.nome_funcionario, ' (', f.matricula_funcionario, ')') as funcionario_info,
-                       e.validade_certificado_aprovacao
+            cursor.execute(
+                """
+                SELECT
+                    n.id,
+                    n.ca_epi,
+                    n.matricula_funcionario,
+                    n.dias_para_vencimento,
+                    n.data_verificacao,
+                    n.enviado,
+                    n.data_envio,
+                    e.nome_epi,
+                    e.tipo_epi,
+                    e.validade_certificado_aprovacao,
+                    f.nome_funcionario,
+                    f.telefone,
+                    f.whatsapp
                 FROM notificacoes_vencimento n
                 JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
                 JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
                 WHERE n.enviado = FALSE
                 ORDER BY n.dias_para_vencimento ASC, n.data_verificacao DESC
-            """)
-        
+                """
+            )
+
         notificacoes = cursor.fetchall()
-        
-        # Formatar datas
+
         for notif in notificacoes:
             notif['data_verificacao'] = notif['data_verificacao'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_verificacao'] else None
             notif['data_envio'] = notif['data_envio'].strftime('%Y-%m-%d %H:%M:%S') if notif['data_envio'] else None
             notif['validade_certificado_aprovacao'] = notif['validade_certificado_aprovacao'].strftime('%Y-%m-%d') if notif['validade_certificado_aprovacao'] else None
-        
+
         return jsonify({
             'total': len(notificacoes),
             'notificacoes': notificacoes
         }), 200
-        
+
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
     finally:
@@ -527,27 +585,30 @@ def obter_notificacoes_pendentes():
 @api_routes.route('/api/notificacoes/marcar-enviado/<int:notificacao_id>', methods=['PUT'])
 def marcar_notificacao_enviada(notificacao_id):
     """
-    Marca uma notificação como enviada (útil após disparar a notificação para o usuário)
+    Marca uma notificação como enviada após o disparo.
     """
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        cursor.execute("""
+
+        cursor.execute(
+            """
             UPDATE notificacoes_vencimento
             SET enviado = TRUE, data_envio = NOW()
             WHERE id = %s
-        """, (notificacao_id,))
-        
+            """,
+            (notificacao_id,)
+        )
+
         conn.commit()
-        
+
         if cursor.rowcount == 0:
             return jsonify({"erro": "Notificação não encontrada"}), 404
-        
+
         return jsonify({'message': 'Notificação marcada como enviada'}), 200
-        
+
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
     finally:
@@ -560,35 +621,34 @@ def marcar_notificacao_enviada(notificacao_id):
 @api_routes.route('/api/notificacoes/status', methods=['GET'])
 def status_notificacoes():
     """
-    Retorna um resumo do status das notificações de vencimento
+    Retorna um resumo do status das notificações de vencimento.
     """
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        
-        # Total de notificações pendentes
+
         cursor.execute("SELECT COUNT(*) as pendentes FROM notificacoes_vencimento WHERE enviado = FALSE")
         pendentes = cursor.fetchone()['pendentes']
-        
-        # Total de notificações enviadas
+
         cursor.execute("SELECT COUNT(*) as enviadas FROM notificacoes_vencimento WHERE enviado = TRUE")
         enviadas = cursor.fetchone()['enviadas']
-        
-        # EPIs com vencimento em até 7 dias
-        cursor.execute("""
+
+        cursor.execute(
+            """
             SELECT COUNT(*) as criticos FROM notificacoes_vencimento
             WHERE enviado = FALSE AND dias_para_vencimento <= 7
-        """)
+            """
+        )
         criticos = cursor.fetchone()['criticos']
-        
+
         return jsonify({
             'pendentes': pendentes,
             'enviadas': enviadas,
             'criticos': criticos
         }), 200
-        
+
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
     finally:
@@ -598,7 +658,165 @@ def status_notificacoes():
             conn.close()
 
 
-# ============ ROTAS PARA ARMAZENAR OS CAS VENCENDO ============
+@api_routes.route('/api/notificacoes/enviar-sms', methods=['POST'])
+def enviar_notificacoes_sms():
+    """
+    Envia as notificações pendentes por SMS.
+    Body opcional:
+      - destinatario: número específico para sobrescrever o destino
+      - matricula: filtra uma matrícula específica
+    """
+    return _enviar_notificacoes_por_tipo('sms')
+
+
+@api_routes.route('/api/notificacoes/enviar-whatsapp', methods=['POST'])
+def enviar_notificacoes_whatsapp():
+    """
+    Envia as notificações pendentes por WhatsApp.
+    Body opcional:
+      - destinatario: número específico para sobrescrever o destino
+      - matricula: filtra uma matrícula específica
+    """
+    return _enviar_notificacoes_por_tipo('whatsapp')
+
+
+def _enviar_notificacoes_por_tipo(tipo_envio):
+    conn = None
+    cursor = None
+    try:
+        dados = request.get_json(silent=True) or {}
+        matricula = dados.get('matricula')
+        destinatario = dados.get('destinatario')
+
+        account_sid = os.getenv('TWILIO_ACCOUNT_SID')
+        auth_token = os.getenv('TWILIO_AUTH_TOKEN')
+        sms_from = os.getenv('TWILIO_PHONE_NUMBER')
+        whatsapp_from = os.getenv('TWILIO_WHATSAPP_NUMBER')
+
+        if not account_sid or not auth_token:
+            return jsonify({"erro": "Credenciais do Twilio não configuradas"}), 500
+
+        if tipo_envio == 'whatsapp' and not whatsapp_from:
+            return jsonify({"erro": "Número do WhatsApp não configurado"}), 500
+
+        if tipo_envio == 'sms' and not sms_from:
+            return jsonify({"erro": "Número do SMS não configurado"}), 500
+
+        client = Client(account_sid, auth_token)
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if matricula:
+            cursor.execute(
+                """
+                SELECT
+                    n.id,
+                    n.ca_epi,
+                    n.matricula_funcionario,
+                    n.dias_para_vencimento,
+                    e.nome_epi,
+                    e.validade_certificado_aprovacao,
+                    f.nome_funcionario,
+                    f.telefone,
+                    f.whatsapp
+                FROM notificacoes_vencimento n
+                JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
+                JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
+                WHERE n.enviado = FALSE
+                  AND n.matricula_funcionario = %s
+                ORDER BY n.dias_para_vencimento ASC
+                """,
+                (matricula,)
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT
+                    n.id,
+                    n.ca_epi,
+                    n.matricula_funcionario,
+                    n.dias_para_vencimento,
+                    e.nome_epi,
+                    e.validade_certificado_aprovacao,
+                    f.nome_funcionario,
+                    f.telefone,
+                    f.whatsapp
+                FROM notificacoes_vencimento n
+                JOIN epi e ON n.ca_epi = e.certificado_aprovacao_epi
+                JOIN funcionarios f ON n.matricula_funcionario = f.matricula_funcionario
+                WHERE n.enviado = FALSE
+                ORDER BY n.dias_para_vencimento ASC
+                """
+            )
+
+        notificacoes = cursor.fetchall()
+        contador_sucesso = 0
+
+        for notif in notificacoes:
+            telefone_destino = formatar_para_twilio(
+                destinatario or notif.get('whatsapp') or notif.get('telefone')
+            )
+
+            if not telefone_destino:
+                continue
+
+            mensagem = (
+                f"Olá {notif['nome_funcionario']}, o EPI {notif['nome_epi']} "
+                f"(CA {notif['ca_epi']}) vence em {notif['dias_para_vencimento']} dias. "
+                f"Validade: {notif['validade_certificado_aprovacao']}"
+            )
+
+            if tipo_envio == 'whatsapp':
+                client.messages.create(
+                    body=mensagem,
+                    from_=f"whatsapp:{whatsapp_from}",
+                    to=f"whatsapp:{telefone_destino}"
+                )
+            else:
+                client.messages.create(
+                    body=mensagem,
+                    from_=sms_from,
+                    to=telefone_destino
+                )
+
+            cursor.execute(
+                """
+                UPDATE notificacoes_vencimento
+                SET enviado = TRUE, data_envio = NOW()
+                WHERE id = %s
+                """,
+                (notif['id'],)
+            )
+            contador_sucesso += 1
+
+        conn.commit()
+        return jsonify({
+            'message': f'Processamento concluído. {contador_sucesso} notificação(ões) enviada(s) por {tipo_envio}',
+            'enviadas': contador_sucesso,
+            'tipo': tipo_envio,
+            'destinatario': destinatario
+        }), 200
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@api_routes.route('/api/notificar-vencimentos', methods=['POST'])
+def notificar_vencimentos_compat():
+    dados = request.get_json(silent=True) or {}
+    tipo = dados.get('tipo', 'sms')
+    if tipo == 'whatsapp':
+        return enviar_notificacoes_whatsapp()
+    return enviar_notificacoes_sms()
+
+
+# ============ ROTAS DE HTML ============
 
 # HTML ROUTES - Rotas para renderizar as páginas HTML
 @api_routes.route('/index')
