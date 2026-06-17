@@ -35,6 +35,99 @@ def formatar_para_twilio(telefone_raw):
     # Retorna como está caso não tenha padrão
     return numeros
 
+def buscarPanel():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+    SELECT COUNT(*) AS total
+    FROM epi
+    WHERE DATE(validade_certificado_aprovacao) = CURDATE()
+""")
+    vencendoHoje = cursor.fetchone()["total"]
+
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM registros
+        WHERE data_entrega = CURDATE()
+    """)
+    entregasHoje = cursor.fetchone()["total"]
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "vencimentos_hoje" : vencendoHoje,
+        "entregas_hoje" : entregasHoje
+    }
+
+def buscarDashboard():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # Total de EPIs
+    cursor.execute("SELECT COUNT(*) AS total FROM epi")
+    total_epi = cursor.fetchone()["total"]
+
+    #registros criados hoje
+    cursor.execute("SELECT COUNT(*) AS total FROM registros WHERE data_entrega = CURDATE()")
+    registros_hoje = cursor.fetchone()['total']
+
+    # Total de funcionários
+    cursor.execute("SELECT COUNT(*) AS total FROM funcionarios")
+    total_funcionarios = cursor.fetchone()["total"]
+
+    # EPIs vencendo em 7 dias
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM epi
+        WHERE validade_certificado_aprovacao
+        BETWEEN CURDATE()
+        AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+    """)
+    vencendo = cursor.fetchone()["total"]
+
+    # Registros feitos hoje
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM registros
+        WHERE data_entrega = CURDATE()
+    """)
+    registros_hoje = cursor.fetchone()["total"]
+
+    # Últimos registros
+    cursor.execute("""
+        SELECT
+            f.nome_funcionario,
+            e.nome_epi,
+            r.data_entrega,
+            r.data_troca
+        FROM registros r
+        INNER JOIN funcionarios f
+            ON r.matricula_funcionario = f.matricula_funcionario
+        INNER JOIN epi e
+            ON r.ca_EPI = e.certificado_aprovacao_epi
+        ORDER BY r.data_entrega DESC
+        LIMIT 10
+    """)
+
+    ultimos_registros = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "total_epi": total_epi,
+        "total_funcionarios": total_funcionarios,
+        "registros_hoje": registros_hoje,
+        "vencendo_7_dias": vencendo,
+        "ultimos_registros": ultimos_registros
+    }
+
+@api_routes.route('/teste-dashboard')
+def teste_dashboard():
+    return jsonify(buscarDashboard())
+
 
 # ============ CREATE ============
 # Definição das rotas para cadastro de funcionários, EPIs e registros
@@ -886,7 +979,9 @@ def _enviar_notificacoes_por_tipo(tipo_envio, dados=None):
 # HTML ROUTES - Rotas para renderizar as páginas HTML
 @api_routes.route('/')
 def index():
-    return render_template('index.html')
+    dashboard = buscarDashboard()
+    panel = buscarPanel()
+    return render_template('index.html', dashboard=dashboard, panel=panel)
 
 @api_routes.route('/cadastro-funcionario')
 def cadastro_funcionario():
@@ -911,7 +1006,7 @@ def atualizar_cadastros():
 # ============ GERAÇÃO DE GRÁFICOS ============
 # Gera gráficos para serem usados nno frontend
 
-@api_routes.route('/api/graficos/devolucao')
+@api_routes.route('/api/graficos/light')
 def gerarGrafico():
     conn = None
     cursor = None
@@ -958,5 +1053,7 @@ def gerarGrafico():
             cursor.close()
         if conn:
             conn.close()
+
+
 
 # @api_routes.route('/api/graficos/')

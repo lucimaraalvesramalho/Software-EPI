@@ -6,7 +6,7 @@ if (epiForm) {
         const dados = {
             nome_epi: document.getElementById('nome').value,
             tipo_epi: document.getElementById('tipo').value,
-            certificado_aprovacao_epi: document.getElementById('ca').value,
+            certificado_aprovacao_epi: document.getElementById('ca').value.toUpperCase(),
             validade_certificado_aprovacao: document.getElementById('validade_ca').value
         };
 

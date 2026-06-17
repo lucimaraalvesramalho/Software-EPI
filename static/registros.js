@@ -48,6 +48,7 @@ async function buscarRegistros() {
             <td>${usuario.matricula_funcionario}</td>
             <td>${usuario.ca_EPI}</td>
             <td>${usuario.data_devolucao}</td>
+            <td>${usuario.data_entrega}</td>
             <td>${usuario.data_troca ?? "Não trocado"}</td>
             <td>${usuario.motivo_devolucao ?? "Em uso"}</td>
         </tr>`;

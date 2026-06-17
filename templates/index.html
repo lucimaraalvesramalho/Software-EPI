@@ -68,22 +68,15 @@
                 <li>
                     <span class="dot warning"></span>
                     <div>
-                        <strong>3 EPIs vencem hoje</strong>
+                        <strong>{{ panel.vencimentos_hoje }} EPIs vencem hoje</strong>
                         <p>Atualize os registros para evitar atrasos.</p>
                     </div>
                 </li>
                 <li>
                     <span class="dot success"></span>
                     <div>
-                        <strong>12 entregas concluídas</strong>
-                        <p>Hoje já foram registrados 12 itens.</p>
-                    </div>
-                </li>
-                <li>
-                    <span class="dot info"></span>
-                    <div>
-                        <strong>Nova atualização</strong>
-                        <p>O painel foi ajustado com novas métricas.</p>
+                        <strong>{{ panel.entregas_hoje }} entregas concluídas</strong>
+                        <p>Hoje já foram registrados {{ panel.entregas_hoje }} itens.</p>
                     </div>
                 </li>
             </ul>
@@ -106,25 +99,22 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for registro in dashboard.ultimos_registros %}
                     <tr>
-                        <td>Ana Silva</td>
-                        <td>Capacete</td>
-                        <td>16/06/2026</td>
-                        <td><span class="badge success">OK</span></td>
+                        <td>{{ registro.nome_funcionario }}</td>
+                        <td>{{ registro.nome_epi }}</td>
+                        <td>{{ registro.data_entrega }}</td>
+
+                        <td>
+                            {% if registro.data_troca %}
+                                <span class="badge success">Devolvido</span>
+                            {% else %}
+                                <span class="badge warning">Em uso</span>
+                            {% endif %}
+                        </td>
                     </tr>
-                    <tr>
-                        <td>João Pereira</td>
-                        <td>Botina</td>
-                        <td>15/06/2026</td>
-                        <td><span class="badge warning">Atento</span></td>
-                    </tr>
-                    <tr>
-                        <td>Maria Costa</td>
-                        <td>Óculos</td>
-                        <td>14/06/2026</td>
-                        <td><span class="badge success">OK</span></td>
-                    </tr>
-                </tbody>
+                    {% endfor %}
+</tbody>
             </table>
         </div>
     </section>

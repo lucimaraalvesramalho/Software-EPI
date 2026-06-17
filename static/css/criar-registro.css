@@ -55,7 +55,7 @@ form{
 }
 
 input{
-    border-radius: 5px;
+    border-radius: 8px;
     height: 2rem;
     width: 25vw;
     text-align: center;
@@ -67,7 +67,7 @@ input{
 form button{
     height: 2.5rem;
     width: 25vw;
-    border-radius: 5px;
+    border-radius: 15px;
     background-color: var(--primary);
     border: none;
     transition: all 0.1s ease-in-out;
