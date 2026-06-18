@@ -27,3 +27,18 @@ setTheme(localStorage.getItem("theme") === "dark");
 button.addEventListener("click", () => {
     setTheme(!document.body.classList.contains("dark-theme"));
 });
+
+function formatarData(input) {
+    let valor = input.value.replace(/\D/g, '');
+
+    if (valor.length > 2) valor = valor.slice(0, 2) + '/' + valor.slice(2);
+    if (valor.length > 5) valor = valor.slice(0, 5) + '/' + valor.slice(5);
+
+    input.value = valor.slice(0, 10);
+}
+
+function manterPrefixo(input, prefixo) {
+    if (!input.value.startsWith(prefixo)) {
+        input.value = prefixo;
+    }
+}

@@ -9,18 +9,20 @@ main{
 
 .cadastro{
     display: flex;
-    position: relative;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     gap: 15px;
     width: fit-content;
+    max-width: 800px;
     height: fit-content;
+    max-height: 600px;
     border: none;
-    padding: 5px;
     border-radius: 25px;
     background-color: var(--bg-color);
     box-shadow: var(--shadow);
-    padding: 0 1%;
+    padding: 0;
+    overflow: hidden;
+    padding-left: 2%    ;
 }
 
 form{
@@ -31,7 +33,7 @@ form{
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    margin: 5% 1% 5% 0;
+    padding: 5% 1% 5% 0;
     transform: scale(1);
     font-size: small;
 }
@@ -49,13 +51,14 @@ input{
 .bg-img{
     padding: 0;
     margin: 0;
-    height: 80%;
-    aspect-ratio: 1/1.45;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    flex-shrink: 0;
+    aspect-ratio: 1/1.6;
     background-image: url(/static/img/funcionario.jpg);
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: center;
-    border-radius: 15px;
     object-fit: cover;
     user-select: none;
     pointer-events: none;
@@ -72,6 +75,7 @@ form button{
     font-size: medium;
     font-weight: 550;
     margin-top: 2%;
+    margin-bottom: 0;
 }
 
 form button:hover{

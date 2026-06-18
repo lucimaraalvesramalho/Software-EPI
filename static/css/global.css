@@ -26,8 +26,8 @@
     --badge-success-text: #15803d;
     --badge-warning-bg: #fff7db;
     --badge-warning-text: #b45309;
-    --shadow: 0 0px 10px rgba(0, 0, 0, 0.162);
-    --img-shadow: 2px 2px 12px rgba(0, 0, 0, 0.259);
+    --shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
+    --img-shadow: 0px 0px 12px rgba(0, 0, 0, 0.259);
 }
 
 .dark-theme{
@@ -51,7 +51,7 @@
     --badge-success-text: #8ee5a2;
     --badge-warning-bg: #3d2c0d;
     --badge-warning-text: #f7c96a;
-    --shadow: 0 0px 10px rgba(255, 255, 255, 0.082);
+    --shadow: 0 0 10px 5px rgba(255, 255, 255, 0.025);
     --img-shadow: 2px 0px 8px rgba(255, 255, 255, 0.111);
 }
 
@@ -182,4 +182,22 @@ nav{
 
 input[type="date"]{
     cursor: text;
+}
+
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root) {
+    animation: none;
+}
+
+::view-transition-new(root) {
+    animation: fade-in .2s ease;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
 }

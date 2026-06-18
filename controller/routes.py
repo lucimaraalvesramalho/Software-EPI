@@ -85,15 +85,17 @@ def buscarDashboard():
         BETWEEN CURDATE()
         AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
     """)
-    vencendo = cursor.fetchone()["total"]
+    vencendo7 = cursor.fetchone()["total"]
 
-    # Registros feitos hoje
+    # EPIs vencendo em 7 dias
     cursor.execute("""
         SELECT COUNT(*) AS total
-        FROM registros
-        WHERE data_entrega = CURDATE()
+        FROM epi
+        WHERE validade_certificado_aprovacao
+        BETWEEN CURDATE()
+        AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
     """)
-    registros_hoje = cursor.fetchone()["total"]
+    vencendo30 = cursor.fetchone()["total"]
 
     # Últimos registros
     cursor.execute("""
@@ -119,8 +121,8 @@ def buscarDashboard():
     return {
         "total_epi": total_epi,
         "total_funcionarios": total_funcionarios,
-        "registros_hoje": registros_hoje,
-        "vencendo_7_dias": vencendo,
+        "vencendo_30_dias": vencendo30,
+        "vencendo_7_dias": vencendo7,
         "ultimos_registros": ultimos_registros
     }
 

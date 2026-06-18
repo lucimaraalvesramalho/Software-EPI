@@ -172,6 +172,10 @@
 .dot.warning { background: #f59e0b; }
 .dot.success { background: #16a34a; }
 .dot.info { background: #2563eb; }
+.red{
+    background-color: rgb(204, 0, 0);
+    color: #ef4444;
+}
 
 .table-panel {
     overflow: hidden;
