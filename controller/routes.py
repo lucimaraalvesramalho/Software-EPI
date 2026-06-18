@@ -918,7 +918,7 @@ def _enviar_notificacoes_por_tipo(tipo_envio, dados=None):
             # Monta a mensagem
             mensagem = (
                 f"Olá {notif['nome_funcionario']}, o EPI {notif['nome_epi']} "
-                f"(CA {notif['ca_epi']}) vence em {notif['dias_para_vencimento']} dias. "
+                f"({notif['ca_epi']}) vence em {notif['dias_para_vencimento']} dias. "
                 f"Validade: {notif['validade_certificado_aprovacao']}"
             )
 
