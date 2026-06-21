@@ -25,22 +25,25 @@ static/
 │   ├── cadastro-epi.css
 │   ├── cadastro-funcionario.css
 │   ├── criar-registro.css
+│   ├── dashboard.css
 │   └── global.css
 ├── epis.js
 ├── funcionarios.js
 ├── registros.js
 ├── script.js
 templates/
-├── atualizar-cadastros.html
-├── atualizar-registros.html
+└── components/
+│   └── header.html
 ├── base.html
 ├── cadastrar-epi.html
 ├── cadastrar-funcionario.html
 ├── criar-registro.html
+├── epis.html
+├── funcionarios.html
 ├── index.html
-└── components/
-    └── header.html
+├── registros.html
 database.py
+epi_db.sql
 ```
 
 ## Requisitos
