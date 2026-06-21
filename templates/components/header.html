@@ -7,25 +7,17 @@
                 <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="text">Início</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.cadastro_funcionario' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.cadastro_funcionario') }}">
+            <div class="link-container {% if request.endpoint == 'api_routes.funcionarios' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.funcionarios') }}">
                 <span class="icon"><i class="fas fa-user-plus"></i></span>
-                <span class="text">Cadastrar Funcionário</span>
+                <span class="text">Funcionários</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.cadastro_epi' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.cadastro_epi') }}">
+            <div class="link-container {% if request.endpoint == 'api_routes.epis' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.epis') }}">
                 <span class="icon"><i class="fas fa-hard-hat"></i></span>
-                <span class="text">Cadastrar EPI</span>
+                <span class="text">EPIs</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.criar_registro' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.criar_registro') }}">
-                <span class="icon"><i class="fas fa-file-medical"></i></span>
-                <span class="text">Criar novo registro</span>
-            </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.atualizar_cadastros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.atualizar_cadastros') }}">
-                <span class="icon"><i class="fas fa-user-edit"></i></span>
-                <span class="text">Atualizar cadastros</span>
-            </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.atualizar_registros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.atualizar_registros') }}">
+            <div class="link-container {% if request.endpoint == 'api_routes.registros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.registros') }}">
                 <span class="icon"><i class="fas fa-edit"></i></span>
-                <span class="text">Atualizar registros</span>
+                <span class="text">registros</span>
             </a></div>
         </nav>
     </header>

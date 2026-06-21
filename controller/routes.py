@@ -4,7 +4,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from io import BytesIO
-from models.tables import funcionario, epi, registros
+from models.tables import funcionario, epi, Registros
 from database import get_db_connection
 from datetime import datetime, timedelta
 import json
@@ -53,12 +53,21 @@ def buscarPanel():
     """)
     entregasHoje = cursor.fetchone()["total"]
 
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM epi
+        WHERE validade_certificado_aprovacao < CURDATE()
+    """)
+
+    vencidos = cursor.fetchone()["total"]
+
     cursor.close()
     conn.close()
 
     return {
         "vencimentos_hoje" : vencendoHoje,
-        "entregas_hoje" : entregasHoje
+        "entregas_hoje" : entregasHoje,
+        "vencidos" : vencidos
     }
 
 def buscarDashboard():
@@ -109,7 +118,9 @@ def buscarDashboard():
             ON r.matricula_funcionario = f.matricula_funcionario
         INNER JOIN epi e
             ON r.ca_EPI = e.certificado_aprovacao_epi
-        ORDER BY r.data_entrega DESC
+        ORDER BY r.data_entrega DESC,
+         r.matricula_funcionario DESC,
+         r.ca_EPI DESC
         LIMIT 10
     """)
 
@@ -226,13 +237,11 @@ def cadastrar_registro():
         dados = request.get_json()
 
         # Cria objeto do registro
-        registro = registros(
+        registro = Registros(
             dados['matricula_funcionario'], 
             dados['ca_EPI'],
-            None,
-            dados['data_devolucao'], 
-            dados.get('data_troca'),
-            dados.get('motivo_devolucao')
+            None,   
+            dados['data_devolucao']
         )
 
         # Conecta ao banco
@@ -401,9 +410,9 @@ def atualizar_funcionario(matricula):
 
         sql = """UPDATE funcionarios 
                  SET nome_funcionario = %s, cpf_funcionario = %s, setor_funcionario = %s, 
-                     funcao_funcionario = %s, data_admissao_funcionario = %s 
+                     funcao_funcionario = %s, data_admissao_funcionario = %s, telefone = %s, email = %s, whatsapp = %s 
                  WHERE matricula_funcionario = %s"""
-        cursor.execute(sql, (dados.get('nome_funcionario', funcionario_atual[1]), dados.get('cpf_funcionario', funcionario_atual[2]), dados.get('setor_funcionario', funcionario_atual[3]), dados.get('funcao_funcionario', funcionario_atual[4]), dados.get('data_admissao_funcionario', funcionario_atual[5]), matricula))
+        cursor.execute(sql, (dados.get('nome_funcionario', funcionario_atual[1]), dados.get('cpf_funcionario', funcionario_atual[2]), dados.get('setor_funcionario', funcionario_atual[3]), dados.get('funcao_funcionario', funcionario_atual[4]), dados.get('data_admissao_funcionario', funcionario_atual[5]), dados.get('telefone', funcionario_atual[6]),dados.get('email', funcionario_atual[7]),dados.get('whatsapp', funcionario_atual[8]), matricula))
 
         conn.commit()
         return jsonify({'message': 'Funcionário atualizado com sucesso'}), 200
@@ -989,6 +998,14 @@ def index():
 def cadastro_funcionario():
     return render_template('cadastrar-funcionario.html')
 
+@api_routes.route('/funcionarios')
+def funcionarios():
+    return render_template('funcionarios.html')
+
+@api_routes.route('/epis')
+def epis():
+    return render_template('epis.html')
+
 @api_routes.route('/cadastro-epi')
 def cadastro_epi():
     return render_template('cadastrar-epi.html')
@@ -997,9 +1014,9 @@ def cadastro_epi():
 def criar_registro():
     return render_template('criar-registro.html')   
 
-@api_routes.route('/atualizar-registro')
-def atualizar_registros():
-    return render_template('atualizar-registros.html')
+@api_routes.route('/registros')
+def registros():
+    return render_template('registros.html')
 
 @api_routes.route('/atualizar-cadastros')
 def atualizar_cadastros():

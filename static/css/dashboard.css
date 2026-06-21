@@ -169,6 +169,7 @@
     margin-top: 0.4rem;
 }
 
+.dot.danger { background: #0d0d0d; }
 .dot.warning { background: #f59e0b; }
 .dot.success { background: #16a34a; }
 .dot.info { background: #2563eb; }

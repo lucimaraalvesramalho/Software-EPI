@@ -60,10 +60,6 @@
         </section>
 
         <section class="panel">
-            <div class="panel-header">
-                <h2>Notificações</h2>
-                <a href="#">Ver tudo</a>
-            </div>
             <ul class="notification-list">
                 <li>
                     <span class="dot warning"></span>
@@ -79,6 +75,13 @@
                         <p>Hoje já foram registrados {{ panel.entregas_hoje }} itens.</p>
                     </div>
                 </li>
+                <li>
+                    <span class="dot danger"></span>
+                    <div>
+                        <strong>{{ panel.vencidos }} EPIs vencidos</strong>
+                        <p> Recolha os epis vencidos imediatamente.</p>
+                    </div>
+                </li>
             </ul>
         </section>
     </div>
@@ -86,7 +89,6 @@
     <section class="panel table-panel">
         <div class="panel-header">
             <h2>Últimos registros</h2>
-            <a href="#">Exportar</a>
         </div>
         <div class="table-wrap">
             <table>
@@ -119,4 +121,11 @@
         </div>
     </section>
 </section>
+<script>document.addEventListener("change", (event) => {
+    if (event.target.name === "registro") {
+        document
+            .getElementById("toolbar")
+            .classList.add("ativo");
+    }
+});</script>
 {% endblock %}

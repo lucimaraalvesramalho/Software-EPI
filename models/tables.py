@@ -18,7 +18,7 @@ class funcionario:
         self.whatsapp = whatsapp
 
     
-class registros:
+class Registros:
     def __init__(self, matricula_funcionario, ca_EPI, data_entrega=None, data_devolucao=None, data_troca=None, motivo_devolucao=None):
         self.matricula_funcionario = matricula_funcionario
         self.ca_EPI = ca_EPI

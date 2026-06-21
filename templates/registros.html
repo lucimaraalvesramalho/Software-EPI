@@ -7,6 +7,12 @@
 {% block content %}
 
 <h1>Tabela de Registros</h1>
+<h3>Selecione uma linha para editar os dados</h3>
+
+<a href="{{ url_for('api_routes.criar_registro') }}" class="btn-primary">
+            <i class="fa-solid fa-plus"></i>
+            Novo Registro
+</a>
 
 <div id="table-wrapper">
 

@@ -92,8 +92,8 @@ async function editarRegistro() {
     linha.cells[1].innerHTML = `<input value="${linha.cells[1].textContent}">`;
     linha.cells[2].innerHTML = `<input value="${linha.cells[2].textContent}">`;
     linha.cells[3].innerHTML = `<input type="date" value="${linha.cells[3].textContent}">`;
-    linha.cells[4].innerHTML = `<input type="date" value="${linha.cells[4].textContent}">`;
-    linha.cells[5].innerHTML = `<input value="${linha.cells[5].textContent}">`;
+    linha.cells[5].innerHTML = `<input type="date" value="${linha.cells[5].textContent}">`;
+    linha.cells[6].innerHTML = `<input value="${linha.cells[6].textContent}">`;
 
     toolbar.classList.add("editando");
 }

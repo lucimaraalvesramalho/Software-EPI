@@ -1,6 +1,5 @@
 *.env
 NOTIFICACOES_README.md
-*.sql
 
 __pycache__/*
 *.pyc
