@@ -64,12 +64,7 @@ venv\Scripts\activate
 2. Instale as dependências:
 
 ```bash
-pip install flask
-```
-
-instale também:
-```bash
-pip install mysql-connector-python
+pip install flask mysql-connector-python matplotlib python-dotenv twilio
 ```
 
 ## Execução
