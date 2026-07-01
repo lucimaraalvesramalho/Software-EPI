@@ -228,6 +228,14 @@ th {
         align-items: flex-start;
     }
 
+    .stat-card .panel {
+        width: 80%
+    }
+
+    .table-panel{
+        display:none
+    }
+
     .stats-grid,
     .dashboard-grid {
         grid-template-columns: 1fr;

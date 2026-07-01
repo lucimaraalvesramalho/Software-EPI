@@ -82,3 +82,43 @@ label{
     text-align: center;
     width: 100%
 }
+
+@media  (max-width: 767px){
+
+    #img-cont{
+
+        display: none;
+    } 
+    
+    h1{
+        font-size:medium;
+        margin: 20px
+    }
+
+    input{
+        width: 80%;
+        font-size: medium;
+        text-align: left;
+    }
+
+    #submit-btn{
+        margin-bottom: 10Px;
+        border-radius: 10px;
+        width: 30vw;
+    }
+
+    label{
+       font-size: medium;
+       text-align: left;
+       width: 80%; 
+    }
+
+    form{
+        gap: 10px
+    }
+
+    .cadastro{
+        width: 80%;
+        max-height: fit-content;
+    }
+}

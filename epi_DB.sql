@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS notificacoes_vencimento (
 );
 
 
-INSERT INTO funcionarios VALUES
+INSERT INTO funcionarios (matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp) VALUES
 ('FUNC0001','Ana Souza','111.111.111-01','Administrativo','Assistente','2023-01-10','(34)90001-0001','ana.souza@empresa.com','(34)90001-0001'),
 ('FUNC0002','Bruno Lima','111.111.111-02','Manutenção','Técnico','2022-05-14','(34)90001-0002','bruno.lima@empresa.com','(34)90001-0002'),
 ('FUNC0003','Carla Mendes','111.111.111-03','RH','Analista','2021-09-20','(34)90001-0003','carla.mendes@empresa.com','(34)90001-0003'),
@@ -114,7 +114,7 @@ INSERT INTO funcionarios VALUES
 ('FUNC0050','Andre Martins','111.111.111-50','Logística','Motorista','2019-06-06','(34)90001-0050','andre.martins@empresa.com','(34)90001-0050');
 
 truncate table epi;
-INSERT INTO EPI VALUES
+INSERT INTO epi (nome_epi, tipo_epi, certificado_aprovacao_epi, validade_certificado_aprovacao) VALUES
 ('Capacete','Proteção Cabeça','CA 000001','2026-06-25'),
 ('Óculos de proteção','Proteção Olhos','CA 000002','2026-07-18'),
 ('Luvas de couro','Proteção Mãos','CA 000003','2026-08-05'),

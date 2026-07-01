@@ -264,3 +264,43 @@ input[type="radio"]:checked::before {
     width: 70%;
     font-size: medium;
 }
+
+@media  (max-width: 767px){
+
+    .bg-img{
+
+        display: none;
+    } 
+    
+    h1{
+        font-size:medium;
+        margin: 20px
+    }
+
+    input{
+        width: 80%;
+        font-size: medium;
+        text-align: left;
+    }
+
+    #submit-btn{
+        margin-top: 20px;
+        border-radius: 10px;
+        width: 30vw;
+    }
+
+    label{
+       font-size: medium;
+       text-align: left;
+       width: 80%; 
+    }
+
+    form{
+        gap: 10px
+    }
+
+    .cadastro{
+        width: 80%;
+        max-height: fit-content;
+    }
+}
