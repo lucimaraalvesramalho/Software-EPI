@@ -7,15 +7,15 @@
                 <span class="icon"><i class="fas fa-home"></i></span>
                 <span class="text">Início</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.funcionarios' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.funcionarios') }}">
+            <div class="link-container {% if request.endpoint in ['api_routes.funcionarios', 'api_routes.cadastro_funcionario'] %}active{% endif %}"><a class="links mobile-nav-link" href="{{ url_for('api_routes.funcionarios') }}" data-mobile-href="{{ url_for('api_routes.cadastro_funcionario') }}">
                 <span class="icon"><i class="fas fa-user-plus"></i></span>
                 <span class="text">Funcionários</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.epis' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.epis') }}">
+            <div class="link-container {% if request.endpoint in ['api_routes.epis', 'api_routes.cadastro_epi'] %}active{% endif %}"><a class="links mobile-nav-link" href="{{ url_for('api_routes.epis') }}" data-mobile-href="{{ url_for('api_routes.cadastro_epi') }}">
                 <span class="icon"><i class="fas fa-hard-hat"></i></span>
                 <span class="text">EPIs</span>
             </a></div>
-            <div class="link-container {% if request.endpoint == 'api_routes.registros' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.registros') }}">
+            <div class="link-container {% if request.endpoint in ['api_routes.registros', 'api_routes.criar_registro'] %}active{% endif %}"><a class="links mobile-nav-link" href="{{ url_for('api_routes.registros') }}" data-mobile-href="{{ url_for('api_routes.criar_registro') }}">
                 <span class="icon"><i class="fas fa-edit"></i></span>
                 <span class="text">registros</span>
             </a></div>

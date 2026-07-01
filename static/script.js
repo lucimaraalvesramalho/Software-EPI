@@ -1,7 +1,26 @@
 const button = document.getElementById("theme-btn");
+const button2 = document.getElementById("theme-btn2");
 const icon = document.getElementById("theme-icon");
 let lastScroll =0;
 const header = document.querySelector("header");
+
+const isMobileNavigation = () => {
+    return window.matchMedia("(max-width: 768px)").matches || window.matchMedia("(pointer: coarse)").matches || navigator.maxTouchPoints > 0;
+};
+
+const mobileLinks = document.querySelectorAll(".mobile-nav-link");
+
+mobileLinks.forEach((link) => {
+    link.addEventListener("click", (event) => {
+        if (!isMobileNavigation()) return;
+
+        const mobileHref = link.dataset.mobileHref;
+        if (!mobileHref) return;
+
+        event.preventDefault();
+        window.location.href = mobileHref;
+    });
+});
 
 window.addEventListener("scroll", () => {
     const currentScroll = window.scrollY;
@@ -24,9 +43,17 @@ const setTheme = (dark) => {
 
 setTheme(localStorage.getItem("theme") === "dark");
 
-button.addEventListener("click", () => {
-    setTheme(!document.body.classList.contains("dark-theme"));
-});
+if (button) {
+    button.addEventListener("click", () => {
+        setTheme(!document.body.classList.contains("dark-theme"));
+    });
+}
+
+if (button2) {
+    button2.addEventListener("click", () => {
+        setTheme(!document.body.classList.contains("dark-theme"));
+    });
+}
 
 function formatarData(input) {
     let valor = input.value.replace(/\D/g, '');
