@@ -52,6 +52,25 @@ CREATE TABLE IF NOT EXISTS notificacoes_vencimento (
     INDEX idx_dias_vencimento (dias_para_vencimento)
 );
 
+create table usuarios(
+id int auto_increment primary key,
+nome varchar(50) not null,
+usuario varchar(50) not null,
+senha varchar(20) not null
+);
+drop table if exists usuarios;
+insert into usuarios(nome,usuario,senha) values
+('carlos','2070','8598'),
+('ana julia','2078','5287'),
+('gabriela','2080','6987'),
+('pedro','2085','2576'),
+('maria','2090','5463'),
+('joao','2093','1462'),
+('jose','2095','7381'),
+('lucas','2098','3486'),
+('lais','4020','6589'),
+('thais','4050','5684');
+
 
 INSERT INTO funcionarios (matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp) VALUES
 ('FUNC0001','Ana Souza','111.111.111-01','Administrativo','Assistente','2023-01-10','(34)90001-0001','ana.souza@empresa.com','(34)90001-0001'),
