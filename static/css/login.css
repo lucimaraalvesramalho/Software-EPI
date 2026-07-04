@@ -1,0 +1,52 @@
+body{
+    font-family: "IBM Plex Serif", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: var(--bg-color);
+}
+#login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 300px;
+    padding: 20px;
+    margin-top: 50px;
+    background-color: var(--login-caixa);
+    border-radius: 8px;
+    box-shadow: var(--login-shadow);
+    position: fixed;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+form{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+input{
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: var(--input-cor-fundo);
+}
+.btn{
+    padding: 10px;
+    background-color: var(--primary);
+    color: var(--text-color);
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+}
+#login-btn{
+    width: 80%;
+}

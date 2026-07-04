@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
 *{
     box-sizing: border-box;
@@ -25,8 +26,10 @@
     --badge-success-bg: #e8f7ee;
     --badge-success-text: #15803d;
     --badge-warning-bg: #fff7db;
+    --input-cor-fundo: #a9d7f548;
     --badge-warning-text: #b45309;
     --shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
+     --login-shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
     --img-shadow: 0px 0px 12px rgba(0, 0, 0, 0.259);
 }
 
@@ -44,6 +47,7 @@
     --edit-color: #e37f7f;
     --bg-table: #1f1c36;
     --table-header: #2f2a5a;
+     --input-cor-fundo: #a9d7f527;
     --table-border: #2a3330;
     --chart-start: #1b2330;
     --chart-end: #12251f;
@@ -52,7 +56,9 @@
     --badge-warning-bg: #3d2c0d;
     --badge-warning-text: #f7c96a;
     --shadow: 0 0 10px 5px rgba(255, 255, 255, 0.025);
+    --login-shadow:none;
     --img-shadow: 2px 0px 8px rgba(255, 255, 255, 0.111);
+    --login-caixa: #1d2421a1;
 }
 
 body{
