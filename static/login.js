@@ -12,14 +12,6 @@ const setTheme = (dark) => {
 
 setTheme(localStorage.getItem("theme") === "dark");
 
-if (button) {
-    button.addEventListener("click", () => {
+button.addEventListener("click", () => {
         setTheme(!document.body.classList.contains("dark-theme"));
     });
-}
-
-if (button2) {
-    button2.addEventListener("click", () => {
-        setTheme(!document.body.classList.contains("dark-theme"));
-    });
-}
