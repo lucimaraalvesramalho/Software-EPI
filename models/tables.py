@@ -35,3 +35,10 @@ class notificacao:
         self.data_verificacao = data_verificacao
         self.enviado = enviado
         self.data_envio = data_envio
+
+class usuarios:
+    def __init__(self, nome,usuario, senha):
+        self.nome = nome
+        self.usuario = usuario
+        self.senha = senha
+  
