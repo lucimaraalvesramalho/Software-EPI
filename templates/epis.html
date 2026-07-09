@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{#
+  Arquivo: epis.html
+  Função: lista de EPIs com tabela interativa.
+  - Usa `cadastro-epi.css` para estilo específico.
+  - A interação (buscar, editar, salvar, deletar) é feita por `epis.js`.
+#}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro-epi.css') }}">
 {% endblock %}
@@ -6,6 +12,7 @@
 <h1>Tabela de EPIs</h1>
 <h3>Selecione uma linha para editar os dados</h3>
 
+<!-- Link para a página de cadastro de novo EPI -->
 <a href="{{ url_for('api_routes.cadastro_epi') }}" class="btn-primary">
             <i class="fa-solid fa-plus"></i>
             Novo EPI
@@ -13,22 +20,27 @@
 
 <div id="table-wrapper">
 
+    <!-- Barra de ferramentas para ações na tabela -->
     <div id="toolbar">
 
+        <!-- Recarregar dados -->
         <button class="toolbar-btn" onclick="buscarEpi()">
             <span class="fa fa-undo"></span>
         </button>
 
+        <!-- Entrar em modo de edição para a linha selecionada -->
         <button class="toolbar-btn edit-btn" onclick="editarEpi()">
             <span class="fa fa-edit"></span>
             Editar
         </button>
 
+        <!-- Salvar alterações feitas em uma linha -->
         <button class="toolbar-btn save-btn" id="" onclick="salvarEpi()">
             <span class="fa fa-save"></span>
             Salvar
         </button>
 
+        <!-- Deletar o registro selecionado -->
         <button class="toolbar-btn delete-btn" onclick="deletarEpi()">
             <span class="fa fa-trash"></span>
             Excluir
@@ -37,6 +49,7 @@
     </div>
 
 
+    <!-- Estrutura da tabela; o `tbody` é preenchido dinamicamente por `epis.js` -->
     <table id="epiTable">
         <thead>
             <tr>
@@ -55,6 +68,7 @@
 
 </div>
 
+<!-- Script que fornece as funções chamadas pelos botões e popula a tabela -->
 <script src="{{ url_for('static', filename='epis.js') }}">
 </script>
 

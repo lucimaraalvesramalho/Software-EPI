@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{#
+  Arquivo: cadastrar-funcionario.html
+  Função: formulário para cadastrar/editar funcionários.
+  - Possui máscaras/validações via JS: formatarCPF, formatarTelefone e manterPrefixo para matrícula.
+  - O envio do formulário é tratado por `funcionarios.js`.
+#}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro-funcionario.css') }}">
 {% endblock %}
@@ -8,12 +14,14 @@
     <main>
         <h1>CADASTRO DE FUNCIONÁRIOS</h1>
         <div class="cadastro">
+                <!-- Formulário com campos importantes como matrícula, CPF, telefone e datas -->
                 <form id="funcionarioForm">
                     <label for="matricula">Matrícula:</label>
                     <input id="matricula" name="matricula_funcionario" type="text" value="FUNC" oninput="manterPrefixo(this, 'FUNC')" placeholder="FUNC0000" maxlength="8" required>
                     <label for="nome">Nome:</label>
                     <input id="nome" name="nome_funcionario" type="text" placeholder="Nome completo" required>
                     <label for="cpf">CPF:</label>
+                    <!-- formatarCPF: função JS que aplica máscara no campo de CPF -->
                     <input id="cpf" oninput="formatarCPF(this)" name="cpf_funcionario" type="text" placeholder="000.000.000-00" maxlength="14" required>
                     <label for="setor">Setor:</label>
                     <input id="setor" name="setor_funcionario" type="text" placeholder="Produção" required>
@@ -36,5 +44,6 @@
     </main>
 {% endblock %}
 {% block extra_js %}
+<!-- Script que lida com envio e validações do formulário -->
 <script src="{{ url_for('static', filename='funcionarios.js') }}" defer></script>
 {% endblock %}

@@ -1,10 +1,19 @@
 {% extends 'base.html' %}
 
+{#
+    Arquivo: index.html
+    Função: página do painel (dashboard) que mostra estatísticas e últimos registros.
+    - Estende `base.html` e injeta CSS extra via `extra_css`.
+    - Usa variáveis passadas pelo backend: `dashboard` e `panel`.
+#}
+
 {% block extra_css %}
+<!-- CSS específico do dashboard -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
+<!-- Conteúdo principal do dashboard -->
 <section class="dashboard-container">
     <div class="dashboard-header">
         <div>
@@ -55,8 +64,9 @@
                 <span>Situação geral</span>
             </div>
             <div class="chart-wrapper">
-                <img src="{{ url_for('api_routes.gerarGrafico') }}" alt="Gráfico de devolução de EPIs" class="chart-image">
-            </div>
+                        <!-- Imagem gerada dinamicamente pelo endpoint `gerarGrafico` -->
+                        <img src="{{ url_for('api_routes.gerarGrafico') }}" alt="Gráfico de devolução de EPIs" class="chart-image">
+                    </div>
         </section>
 
         <section class="panel">
@@ -101,6 +111,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {# Percorre os últimos registros enviados pelo backend e renderiza linhas da tabela #}
                     {% for registro in dashboard.ultimos_registros %}
                     <tr>
                         <td>{{ registro.nome_funcionario }}</td>
@@ -108,6 +119,7 @@
                         <td>{{ registro.data_entrega }}</td>
 
                         <td>
+                            {# Se houver data de troca, EPI foi devolvido; caso contrário está em uso #}
                             {% if registro.data_troca %}
                                 <span class="badge success">Devolvido</span>
                             {% else %}

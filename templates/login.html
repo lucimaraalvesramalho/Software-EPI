@@ -3,15 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Estilos para a tela de login e estilos globais -->
     <link rel="stylesheet" href="../static/css/login.css">
     <link rel="stylesheet" href="../static/css/global.css">
      <script src="https://kit.fontawesome.com/a3a9f84800.js"></script>
     <title>Login</title>
+    <!--
+        Arquivo: login.html
+        Função: formulário simples de autenticação.
+        - Form envia `POST` para `/login` (rota do servidor será responsável por autenticar).
+        - `id="login-theme-btn"` e `login.js` controlam alternância de tema local na página.
+    -->
 </head>
 <body>
     <main>
         <section id="login">
             <h1>Login</h1>
+            <!-- Formulário de login: o backend deve validar usuário e senha -->
             <form method="POST" action="/login">
                 <label for="USUÁRIO">Usuário :</label>
                 <input type="text" id="USUÁRIO" name="USUÁRIO" placeholder="Ex: 1234" required>
@@ -19,7 +27,9 @@
                 <input type="password" id="password" name="password" placeholder="Digite sua senha" required>
                 <br>
                 <div id="botoes">
+                    <!-- Botão de envio do formulário -->
                     <button class="btn" id="login-btn" type="submit">Login</button>
+                    <!-- Botão que alterna tema apenas na interface de login -->
                     <button class="btn" type="button" id="login-theme-btn"><i id="theme-icon" class="fas fa-moon"></i></button>  
                 </div>
                 
@@ -27,6 +37,7 @@
         </section>
         
     </main>
+    <!-- Script local que contém comportamento de UI (tema, validações, etc.) -->
     <script src="../static/login.js"></script>
 </body>
 </html>

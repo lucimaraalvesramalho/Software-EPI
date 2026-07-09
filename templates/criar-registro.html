@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{#
+  Arquivo: criar-registro.html
+  Função: formulário para criar um novo registro de entrega de EPI.
+  - Campos chave: `matricula_funcionario`, `certificado_aprovacao_epi`, `data-devolucao`.
+  - `manterPrefixo` é usada para prefixos como `FUNC` e `CA `.
+#}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/criar-registro.css') }}">
 {% endblock %}
@@ -6,6 +12,7 @@
    <main>
         <h1>REGISTRO DE ENTREGA</h1>
         <div class="cadastro">
+            <!-- Formulário controlado por `registros.js` -->
             <form id="registrosForm">
                 <label for="matricula">Matrícula:</label>
                 <input id="matricula" name="matricula_funcionario" type="text" value="FUNC" oninput="manterPrefixo(this, 'FUNC')" placeholder="FUNC0000" maxlength="8" required>
@@ -22,5 +29,6 @@
     </main>
 {% endblock %}
 {% block extra_js %}
+<!-- Script que trata o envio do formulário e integra com a API de registros -->
 <script src="{{ url_for('static', filename='registros.js') }}" defer></script>
 {% endblock %}

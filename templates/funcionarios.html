@@ -1,4 +1,10 @@
 {% extends 'base.html' %}
+{#
+  Arquivo: funcionarios.html
+  Função: lista de funcionários com ações similares às outras tabelas.
+  - Carrega `cadastro-funcionario.css` para estilo.
+  - `funcionarios.js` preenche e controla a tabela (buscar, editar, salvar, excluir).
+#}
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro-funcionario.css') }}">
 {% endblock %}
@@ -7,6 +13,7 @@
 <h1>Tabela de Funcionários</h1>
 <h3>Selecione uma linha para editar os dados</h3>
 
+<!-- Link para cadastrar novo funcionário -->
 <a href="{{ url_for('api_routes.cadastro_funcionario') }}" class="btn-primary">
             <i class="fa-solid fa-plus"></i>
             Novo Funcionario
@@ -61,6 +68,7 @@
 
 </div>
 
+<!-- Script que popula e controla a tabela de funcionários -->
 <script src="{{ url_for('static', filename='funcionarios.js') }}">
 </script>
 {% endblock %}

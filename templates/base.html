@@ -3,27 +3,45 @@
 
 <head>
     <meta charset="UTF-8">
+    <!--
+        Arquivo: base.html
+        Função: layout base para todas as páginas do projeto.
+        - Inclui cabeçalho, carregamento de CSS/JS comuns e botões de tema.
+        - Templates filhos usam: {% block extra_css %}, {% block content %}, {% block extra_js %}.
+        Observação: Usamos `url_for('static', filename=...)` para referenciar os arquivos estáticos no Flask.
+    -->
     <title>Controle EPI</title>
     <link rel="icon" href="/static/img/favicon.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS global carregado em todas as páginas -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css') }}">
     <script src="https://kit.fontawesome.com/a3a9f84800.js"></script>
+    <!--
+        Block `extra_css`: permite que templates filhos adicionem estilos específicos.
+        Exemplo de uso em um filho: {% block extra_css %}<link ...>{% endblock %}
+    -->
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
+    <!-- Inclui o cabeçalho (nav) reutilizável -->
     {% include 'components/header.html' %}
 
+    <!-- Área principal onde cada página injeta seu conteúdo -->
     <main class="content">
         {% block content %}
         {% endblock %}
     </main>
+
+    <!-- Botão acessível para alternar tema (JS controla o comportamento) -->
     <button id="theme-btn2">
         <i class="fas fa-moon"></i>
     </button>
 
+    <!-- Script global que contém funcionalidades como alternar tema e navegação móvel -->
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <!-- Block `extra_js`: permite que páginas adicionem scripts específicos no fim do body -->
     {% block extra_js %}{% endblock %}
 
 </body>
