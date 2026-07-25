@@ -1,5 +1,5 @@
 ﻿# Importação das bibliotecas utilizadas no backend
-from flask import Blueprint, render_template, request, jsonify, send_file
+from flask import Blueprint, render_template, request, jsonify, send_file, session, redirect, url_for
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -18,6 +18,15 @@ load_dotenv()
 
 # Blueprint para agrupar rotas da API
 api_routes = Blueprint('api_routes', __name__)
+def obter_usuario(usuario, senha):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+    select * from usuarios where usuario = %s and senha = %s""", (usuario,senha))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return resultado
 
 def formatar_para_twilio(telefone_raw):
     if not telefone_raw:
@@ -987,12 +996,34 @@ def _enviar_notificacoes_por_tipo(tipo_envio, dados=None):
 
 # ============ ROTAS DE HTML ============
 
-# HTML ROUTES - Rotas para renderizar as páginas HTML
-@api_routes.route('/')
-def index():
+def exibir():
+
     dashboard = buscarDashboard()
     panel = buscarPanel()
     return render_template('index.html', dashboard=dashboard, panel=panel)
+
+# HTML ROUTES - Rotas para renderizar as páginas HTML
+@api_routes.route('/', methods=["GET", "post"])
+def index():
+    if "usuario" in session: 
+        return exibir()
+    
+    if request.method  == "POST":
+        usuario = request.form["usuario"]
+        senha = request.form["senha"]
+        dados = obter_usuario(usuario,senha)
+        if dados:
+            session.permanent = True
+            session["usuario"] = dados["usuario"]
+            return exibir()
+
+
+    return render_template ("login2.html") 
+
+@api_routes.route("/logout")
+def logout():
+    session.clear()
+    return redirect("/")
 
 @api_routes.route('/cadastro-funcionario')
 def cadastro_funcionario():
