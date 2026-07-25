@@ -1,7 +1,9 @@
+-- Apaga o banco antigo se existir e cria um novo banco chamado Controle_EPI.
 drop database if exists controle_epi;
 CREATE DATABASE Controle_EPI;
 use Controle_EPI;
 
+-- Cria a tabela de funcionários, onde cada registro guarda os dados de um colaborador.
 CREATE TABLE funcionarios (
 	matricula_funcionario VARCHAR(20) PRIMARY KEY NOT NULL UNIQUE,
     nome_funcionario VARCHAR(100) NOT NULL,
@@ -14,6 +16,7 @@ CREATE TABLE funcionarios (
     whatsapp varchar(30)
 );
 
+-- Apaga a tabela de EPIs se existir e cria uma nova para guardar os dados dos itens de proteção.
 drop table if exists epi;
 CREATE TABLE EPI (
     nome_epi VARCHAR(100) NOT NULL,
@@ -22,6 +25,7 @@ CREATE TABLE EPI (
     validade_certificado_aprovacao DATE NOT NULL
 );
 
+-- Apaga a tabela de registros se existir e cria uma nova para guardar entregas e devoluções de EPIs.
 drop table if exists registros;
 CREATE TABLE registros (
     matricula_funcionario VARCHAR(20) NOT NULL,
@@ -35,6 +39,7 @@ CREATE TABLE registros (
     FOREIGN KEY(ca_EPI) references epi(certificado_aprovacao_epi)
 );
 
+-- Apaga a tabela de notificações de vencimento se existir e cria uma nova para avisos de CA prestes a vencer.
 drop table if exists notificacoes_vencimento;
 CREATE TABLE IF NOT EXISTS notificacoes_vencimento (
     id INT AUTO_INCREMENT PRIMARY KEY,
