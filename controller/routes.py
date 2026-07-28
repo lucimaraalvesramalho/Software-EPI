@@ -12,6 +12,7 @@ import os
 import re
 from dotenv import load_dotenv
 from twilio.rest import Client
+from functools import wraps
 
 # Carrega variáveis do ambiente
 load_dotenv()
@@ -149,6 +150,14 @@ def buscarDashboard():
 @api_routes.route('/teste-dashboard')
 def teste_dashboard():
     return jsonify(buscarDashboard())
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "usuario" not in session:
+            return redirect(url_for("api_routes.index"))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # ============ CREATE ============
@@ -1002,6 +1011,10 @@ def exibir():
     panel = buscarPanel()
     return render_template('index.html', dashboard=dashboard, panel=panel)
 
+def verificarLogin():
+    if "usuario" not in session:
+        redirect("/")
+
 # HTML ROUTES - Rotas para renderizar as páginas HTML
 @api_routes.route('/', methods=["GET", "post"])
 def index():
@@ -1018,7 +1031,7 @@ def index():
             return exibir()
 
 
-    return render_template ("login2.html") 
+    return render_template ("login.html") 
 
 @api_routes.route("/logout")
 def logout():
@@ -1026,30 +1039,37 @@ def logout():
     return redirect("/")
 
 @api_routes.route('/cadastro-funcionario')
+@login_required
 def cadastro_funcionario():
     return render_template('cadastrar-funcionario.html')
 
 @api_routes.route('/funcionarios')
+@login_required
 def funcionarios():
     return render_template('funcionarios.html')
 
 @api_routes.route('/epis')
+@login_required
 def epis():
     return render_template('epis.html')
 
 @api_routes.route('/cadastro-epi')
+@login_required
 def cadastro_epi():
     return render_template('cadastrar-epi.html')
 
 @api_routes.route('/criar-registro')
+@login_required
 def criar_registro():
     return render_template('criar-registro.html')   
 
 @api_routes.route('/registros')
+@login_required
 def registros():
     return render_template('registros.html')
 
 @api_routes.route('/atualizar-cadastros')
+@login_required
 def atualizar_cadastros():
     return render_template('atualizar-cadastros.html')
 

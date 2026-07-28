@@ -1,5 +1,5 @@
 body{
-    font-family: "IBM Plex Serif", sans-serif;
+
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -48,5 +48,9 @@ input{
     cursor: pointer;
 }
 #login-btn{
-    width: 80%;
+    width: 100%;
+}
+
+header{
+    display: none;
 }

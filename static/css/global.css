@@ -169,6 +169,15 @@ nav{
     gap:2rem;
 }
 
+#sair{
+    padding: 1.2rem 2rem 1rem 1.1rem;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+
+}
+
 .link-container.active {
     background-color: var(--accent);
     box-shadow: var(--shadow);

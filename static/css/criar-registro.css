@@ -9,7 +9,6 @@ main{
 .cadastro{
     display: flex;
     flex-direction: row;
-    align-items: stretch;
     width: fit-content;
     height: fit-content;
     border: none;
@@ -45,24 +44,14 @@ form{
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: left;
     gap: 5px;
     padding-top: 9%;
 }
 
-input{
-    border-radius: 8px;
-    height: 2rem;
-    width: 25vw;
-    text-align: center;
-    border:none;
-    background-color: var(--tertiary);
-    color: var(--text-color);
-}
-
 form button{
     height: 2.5rem;
-    width: 25vw;
+    width: 95%;
     border-radius: 15px;
     background-color: var(--primary);
     border: none;
@@ -76,12 +65,22 @@ form button:hover{
     transform: translateY(1px);
 }
 
-label{
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    width: 100%
+input{
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: var(--input-cor-fundo);
+    width: 95%;
 }
+
+label{
+    text-align: left;
+    width: 100%;
+    font-size: medium;
+}
+
 
 @media  (max-width: 767px){
 
@@ -105,6 +104,8 @@ label{
         margin-bottom: 10Px;
         border-radius: 10px;
         width: 30vw;
+        font-size: medium;
+        font-weight: bold;
     }
 
     label{
@@ -114,7 +115,9 @@ label{
     }
 
     form{
-        gap: 10px
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
     }
 
     .cadastro{
