@@ -3,7 +3,9 @@ from flask import Blueprint, render_template, request, jsonify, send_file, sessi
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from io import BytesIO
+import csv
+from io import BytesIO, StringIO
+from openpyxl import Workbook
 from models.tables import funcionario, epi, Registros
 from database import get_db_connection
 from datetime import datetime, timedelta
@@ -1118,12 +1120,99 @@ def gerarGrafico():
         )
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
 
+@api_routes.route('/api/export', methods=['GET'])
+@login_required
+def exportar_tabela():
+    tabela = request.args.get('table', '').strip().lower()
+    formato = request.args.get('format', '').strip().lower()
+
+    tabelas_validas = ['funcionarios', 'epi', 'registros']
+    formatos_validos = ['csv', 'xlsx']
+
+    if tabela not in tabelas_validas or formato not in formatos_validos:
+        return jsonify({'erro': 'Parâmetros inválidos. Use table=funcionarios|epi|registros e format=csv|xlsx.'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    if tabela == 'funcionarios':
+        colunas = [
+            'matricula_funcionario',
+            'nome_funcionario',
+            'cpf_funcionario',
+            'setor_funcionario',
+            'funcao_funcionario',
+            'data_admissao_funcionario',
+            'telefone',
+            'email',
+            'whatsapp'
+        ]
+        cursor.execute(
+            'SELECT matricula_funcionario, nome_funcionario, cpf_funcionario, setor_funcionario, funcao_funcionario, data_admissao_funcionario, telefone, email, whatsapp FROM funcionarios'
+        )
+    elif tabela == 'epi':
+        colunas = [
+            'certificado_aprovacao_epi',
+            'nome_epi',
+            'tipo_epi',
+            'validade_certificado_aprovacao'
+        ]
+        cursor.execute(
+            'SELECT certificado_aprovacao_epi, nome_epi, tipo_epi, validade_certificado_aprovacao FROM epi'
+        )
+    else:
+        colunas = [
+            'matricula_funcionario',
+            'ca_EPI',
+            'data_entrega',
+            'data_devolucao',
+            'data_troca',
+            'motivo_devolucao'
+        ]
+        cursor.execute(
+            'SELECT matricula_funcionario, ca_EPI, data_entrega, data_devolucao, data_troca, motivo_devolucao FROM registros'
+        )
+
+    linhas = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    nome_arquivo = f'{tabela}.{formato}'
+
+    if formato == 'csv':
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(colunas)
+        writer.writerows(linhas)
+        arquivo = BytesIO(output.getvalue().encode('utf-8-sig'))
+        arquivo.seek(0)
+        mimetype = 'text/csv'
+    else:
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = tabela
+        sheet.append(colunas)
+        for linha in linhas:
+            sheet.append([valor if valor is not None else '' for valor in linha])
+        arquivo = BytesIO()
+        workbook.save(arquivo)
+        arquivo.seek(0)
+        mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+
+    response = send_file(
+        arquivo,
+        mimetype=mimetype,
+        as_attachment=True,
+        download_name=nome_arquivo
+    )
+
+    if cursor:
+        cursor.close()
+    if conn:
+        conn.close()
+
+    return response
 
 
 # @api_routes.route('/api/graficos/')

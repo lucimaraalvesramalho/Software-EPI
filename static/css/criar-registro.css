@@ -13,7 +13,7 @@ main{
     height: fit-content;
     border: none;
     border-radius: 25px;
-    background-color: var(--bg-color);
+    background-color: var(--login-caixa);
     box-shadow: var(--shadow);
     padding: 0;
     overflow: hidden;

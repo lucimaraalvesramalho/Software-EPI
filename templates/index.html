@@ -11,10 +11,26 @@
             <p class="eyebrow">Painel principal</p>
             <h1>Controle de EPIs</h1>
         </div>
-        <a href="{{ url_for('api_routes.criar_registro') }}" class="btn-primary">
-            <i class="fa-solid fa-plus"></i>
-            Novo registro
-        </a>
+        <div class="header-actions">
+            <a href="{{ url_for('api_routes.criar_registro') }}" class="btn-primary">
+                <i class="fa-solid fa-plus"></i>
+                Novo registro
+            </a>
+            <div class="export-dropdown">
+                <button id="export-button" class="btn-secondary">
+                    <i class="fa-solid fa-file-export"></i>
+                    Exportar
+                </button>
+                <div id="export-menu" class="export-menu hidden">
+                    <a href="#" data-table="funcionarios" data-format="csv">Funcionários CSV</a>
+                    <a href="#" data-table="funcionarios" data-format="xlsx">Funcionários XLSX</a>
+                    <a href="#" data-table="epi" data-format="csv">EPIs CSV</a>
+                    <a href="#" data-table="epi" data-format="xlsx">EPIs XLSX</a>
+                    <a href="#" data-table="registros" data-format="csv">Registros CSV</a>
+                    <a href="#" data-table="registros" data-format="xlsx">Registros XLSX</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="stats-grid">
@@ -127,5 +143,30 @@
             .getElementById("toolbar")
             .classList.add("ativo");
     }
-});</script>
+});
+
+const exportButton = document.getElementById('export-button');
+const exportMenu = document.getElementById('export-menu');
+
+if (exportButton && exportMenu) {
+    exportButton.addEventListener('click', () => {
+        exportMenu.classList.toggle('hidden');
+    });
+
+    document.querySelectorAll('#export-menu a').forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const tabela = event.currentTarget.dataset.table;
+            const formato = event.currentTarget.dataset.format;
+            window.location.href = `/api/export?table=${tabela}&format=${formato}`;
+        });
+    });
+
+    document.addEventListener('click', (event) => {
+        if (!exportMenu.contains(event.target) && !exportButton.contains(event.target)) {
+            exportMenu.classList.add('hidden');
+        }
+    });
+}
+</script>
 {% endblock %}

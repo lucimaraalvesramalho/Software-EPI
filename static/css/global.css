@@ -55,7 +55,7 @@
     --badge-success-text: #8ee5a2;
     --badge-warning-bg: #3d2c0d;
     --badge-warning-text: #f7c96a;
-    --shadow: 0 0 10px 5px rgba(255, 255, 255, 0.025);
+    --shadow: none;
     --login-shadow:none;
     --img-shadow: 2px 0px 8px rgba(255, 255, 255, 0.111);
     --login-caixa: #1d2421a1;
