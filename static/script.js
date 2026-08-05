@@ -144,3 +144,35 @@ function manterPrefixo(input, prefixo) {
         input.value = prefixo;
     }
 }
+
+async function getData() {
+    const resposta = await fetch('api/get-data');
+
+    return await resposta.json()
+}
+
+
+async function criarGrafico() {
+    const dados = await getData();
+
+    new Chart(document.getElementById('graph'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Devolvidos', 'Não devolvidos'],
+            datasets: [{
+                data: [
+                    dados.devolvidos,
+                    dados.nao_devolvidos
+                ]
+            }]
+        },
+        options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+        }
+    }
+});
+}

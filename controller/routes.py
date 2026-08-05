@@ -1078,48 +1078,24 @@ def atualizar_cadastros():
 # ============ GERAÇÃO DE GRÁFICOS ============
 # Gera gráficos para serem usados nno frontend
 
-@api_routes.route('/api/graficos/light')
-def gerarGrafico():
-    conn = None
-    cursor = None
+@api_routes.route('/api/get-data', methods=['GET'])
+def get_data():
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NOT NULL")
+    devolvidos = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NOT NULL")
-        devolvidos = cursor.fetchone()[0]
+    cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NULL")
+    nao_devolvidos = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM registros WHERE data_troca IS NULL")
-        nao_devolvidos = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
 
-        fig, ax = plt.subplots(figsize=(6, 4), facecolor='#f8f7ff')
-        ax.set_facecolor('#f8f7ff')
-
-        ax.pie(
-            [devolvidos, nao_devolvidos],
-            labels=['Devolvidos', 'Não devolvidos'],
-            autopct='%1.1f%%',
-            startangle=90,
-            colors=['#7d6cfd', '#f59e0b'],
-            wedgeprops={'edgecolor': '#f8f7ff', 'linewidth': 1.5},
-            textprops={'color': '#042016', 'fontsize': 10}
-        )
-
-        ax.set_title('Situação dos EPIs', color='#042016', fontsize=12, pad=12)
-        ax.axis('equal')
-
-        buffer = BytesIO()
-        fig.savefig(buffer, format='png', bbox_inches='tight', dpi=150)
-        buffer.seek(0)
-        plt.close(fig)
-
-        return send_file(
-            buffer,
-            mimetype='image/png'
-        )
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
+    return jsonify({
+        "devolvidos" : devolvidos,
+        "nao_devolvidos" : nao_devolvidos
+    })
 
 @api_routes.route('/api/export', methods=['GET'])
 @login_required

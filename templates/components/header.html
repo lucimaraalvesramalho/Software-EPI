@@ -1,6 +1,6 @@
 <header>
          <nav>
-            <div class="link-container theme">
+            <div class="link-container theme" id="theme-container">
                 <button id="theme-btn" class="icon" type="button"><i id="theme-icon" class="fas fa-moon"></i></button>
             </div>
             <div class="link-container {% if request.endpoint == 'api_routes.index' %}active{% endif %}"><a class="links" href="{{ url_for('api_routes.index') }}">

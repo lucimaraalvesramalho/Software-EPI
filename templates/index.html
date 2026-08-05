@@ -71,7 +71,7 @@
                 <span>Situação geral</span>
             </div>
             <div class="chart-wrapper">
-                <img src="{{ url_for('api_routes.gerarGrafico') }}" alt="Gráfico de devolução de EPIs" class="chart-image">
+                <canvas id="graph"></canvas>
             </div>
         </section>
 
@@ -137,6 +137,7 @@
         </div>
     </section>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>document.addEventListener("change", (event) => {
     if (event.target.name === "registro") {
         document
@@ -147,7 +148,6 @@
 
 const exportButton = document.getElementById('export-button');
 const exportMenu = document.getElementById('export-menu');
-
 if (exportButton && exportMenu) {
     exportButton.addEventListener('click', () => {
         exportMenu.classList.toggle('hidden');
@@ -168,5 +168,9 @@ if (exportButton && exportMenu) {
         }
     });
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    criarGrafico();
+});
 </script>
 {% endblock %}
