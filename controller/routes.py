@@ -8,7 +8,7 @@ from io import BytesIO, StringIO
 from openpyxl import Workbook
 from models.tables import funcionario, epi, Registros
 from database import get_db_connection
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 import os
 import re
@@ -121,22 +121,22 @@ def buscarDashboard():
     # Últimos registros
     cursor.execute("""
         SELECT
-            f.nome_funcionario,
-            e.nome_epi,
-            r.data_entrega,
-            r.data_troca
+        f.nome_funcionario,
+        e.nome_epi,
+        r.data_devolucao,
+        r.data_entrega,
+        r.data_troca
         FROM registros r
         INNER JOIN funcionarios f
             ON r.matricula_funcionario = f.matricula_funcionario
         INNER JOIN epi e
             ON r.ca_EPI = e.certificado_aprovacao_epi
-        ORDER BY r.data_entrega DESC,
-         r.matricula_funcionario DESC,
-         r.ca_EPI DESC
-        LIMIT 10
+        WHERE r.data_devolucao <= DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND r.data_troca is null
+        ORDER BY r.data_devolucao ASC;
+        limit 20
     """)
 
-    ultimos_registros = cursor.fetchall()
+    regristros_vencendo = cursor.fetchall()
 
     cursor.close()
     conn.close()
@@ -146,7 +146,7 @@ def buscarDashboard():
         "total_funcionarios": total_funcionarios,
         "vencendo_30_dias": vencendo30,
         "vencendo_7_dias": vencendo7,
-        "ultimos_registros": ultimos_registros
+        "regristros_vencendo": regristros_vencendo
     }
 
 @api_routes.route('/teste-dashboard')
@@ -1011,7 +1011,7 @@ def exibir():
 
     dashboard = buscarDashboard()
     panel = buscarPanel()
-    return render_template('index.html', dashboard=dashboard, panel=panel)
+    return render_template('index.html', dashboard=dashboard, panel=panel, hoje=date.today())
 
 def verificarLogin():
     if "usuario" not in session:

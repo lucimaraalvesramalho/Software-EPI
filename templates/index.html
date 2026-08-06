@@ -104,7 +104,7 @@
 
     <section class="panel table-panel">
         <div class="panel-header">
-            <h2>Últimos registros</h2>
+            <h2>Registros críticos</h2>
         </div>
         <div class="table-wrap">
             <table>
@@ -112,22 +112,22 @@
                     <tr>
                         <th>Funcionário</th>
                         <th>EPI</th>
-                        <th>Data</th>
+                        <th>Data para devolução</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for registro in dashboard.ultimos_registros %}
+                    {% for registro in dashboard.regristros_vencendo %}
                     <tr>
                         <td>{{ registro.nome_funcionario }}</td>
                         <td>{{ registro.nome_epi }}</td>
-                        <td>{{ registro.data_entrega }}</td>
+                        <td>{{ registro.data_devolucao }}</td>
 
                         <td>
-                            {% if registro.data_troca %}
-                                <span class="badge success">Devolvido</span>
-                            {% else %}
-                                <span class="badge warning">Em uso</span>
+                            {% if registro.data_devolucao < hoje %}
+                                <span class="badge dangerous">Vencido</span>
+                            {% else  %}
+                                <span class="badge warning">Vencendo</span>
                             {% endif %}
                         </td>
                     </tr>

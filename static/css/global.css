@@ -28,8 +28,10 @@
     --badge-warning-bg: #fff7db;
     --input-cor-fundo: #a9d7f548;
     --badge-warning-text: #b45309;
+    --badge-dangerous-bg: #4b4b4bc4;
+    --badge-dangerous-text: #ffffffd3;
     --shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
-     --login-shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
+    --login-shadow: 2px 0 20px 5px rgba(0, 0, 0, 0.162);
     --img-shadow: 0px 0px 12px rgba(0, 0, 0, 0.259);
 }
 
@@ -55,6 +57,8 @@
     --badge-success-text: #8ee5a2;
     --badge-warning-bg: #3d2c0d;
     --badge-warning-text: #f7c96a;
+    --badge-dangerous-bg: #979797c4;
+    --badge-dangerous-text: #070707;
     --shadow: none;
     --login-shadow:none;
     --img-shadow: 2px 0px 8px rgba(255, 255, 255, 0.111);
